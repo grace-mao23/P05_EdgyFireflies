@@ -1,3 +1,11 @@
+<<<<<<< HEAD
 graceM -- 2020-06-04 23:43
 - devlog created
 - first version of design doc uploaded
+=======
+jun taoL -- 2020-06-02 15:04
+  Added the basic app structure.
+
+tammyC -- 2020-06-04 21:49
+  Continued to add to basic app structure & uploaded API pdf
+>>>>>>> daf36a9fe34ab83f61340c7e5ebc614de2285560
