@@ -1,7 +1,8 @@
 import os
 import pytest
 
-from app import create_app, clear_db
+from app import create_app, db
+from app.auth.models import User
 
 
 @pytest.fixture
@@ -22,7 +23,14 @@ def app():
     })
 
     with app.app_context():
-        clear_db()
+        db.drop_all()
+        db.create_all()
+
+        user = User(email="test@example.com", username="test", password="test")
+
+        db.session.add(user)
+        
+        db.session.commit()
 
     yield app
 
@@ -40,14 +48,44 @@ def client(app):
     return app.test_client()
 
 
+class AuthActions:
+    """Define the authentication class for testing.
+
+    Actions:
+      register
+      login
+      logout
+    """
+    def __init__(self, client):
+        self._client = client
+
+    def register(self, email="a@example.com", username="a", password="a"):
+        return self._client.post("/auth/register",
+                                 data={
+                                     "email": email,
+                                     "username": username,
+                                     "password": password
+                                 })
+
+    def login(self, username="test", password="test"):
+        return self._client.post("/auth/login",
+                                 data={
+                                     "username": username,
+                                     "password": password
+                                 })
+
+    def logout(self):
+        return self._client.get("/auth/logout")
+
+
 @pytest.fixture
-def runner(app):
-    """Create a test CLI runner for the test app instance.
+def auth(client):
+    """Creates an AuthActions class.
 
     Args:
-      app: A test app instance.
-
+      client: A test client for the given app instance.
+    
     Returns:
-      A test CLI runner for the given app instance.
+      An AuthActions class.
     """
-    return app.test_cli_runner()
+    return AuthActions(client)

@@ -1,24 +1,28 @@
-import click
 import os
 
 from flask import Flask, render_template
-from flask.cli import with_appcontext
+from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 
 # Created SQLAlchemy object, but is not binded to any Flask application
 db = SQLAlchemy()
 
+# Created SocketIO object, but is not binded to any Flask application
+socketio = SocketIO()
+
 
 def create_app(config=None):
     """Create and configure a Flask app.
-
     Args:
       config: A test configuration object.
     
     Returns:
       A Flask application instance.
     """
-    app = Flask(__name__, instance_relative_config=True)
+    # Application configuartion
+    # ---START---
+
+    app = Flask(__name__)
 
     database_url = os.environ.get("DATABASE_URL", None)
 
@@ -27,54 +31,60 @@ def create_app(config=None):
 
     app.config.from_mapping(SECRET_KEY=os.environ.get("SECRET_KEY", "dev"),
                             SQLALCHEMY_DATABASE_URI=database_url,
-                            SQLALCHEMY_TRACK_MODIFICATIONS=False)
+                            SQLALCHEMY_TRACK_MODIFICATIONS=False,
+                            TESTING=os.environ.get("TESTING", False))
 
-    if config is None:
-        app.config.from_pyfile("config.py", silent=True)
-    else:
+    if config is not None:
         app.config.update(config)
 
+    # ---END---
+
+    # Register blueprints
+    # ---START---
+
+    from app import auth
+
+    app.register_blueprint(auth.bp)
+
+    # ---END---
+
+    # Database and socketio configuration
+    # ---START---
+
     db.init_app(app)
-    app.cli.add_command(clear_db_command)
+    socketio.init_app(app)
 
     try:
         os.makedirs(app.instance_path)
+        # Drop and create the table if not exist
         with app.app_context():
-            clear_db()
+            db.drop_all()
+            db.create_all()
     except OSError:
         pass
 
-    # Define a /hello route. Replace or delete for an actual application.
+    # ---END---
+
+    # Define middlewares
+    # ---START---
+
+    @app.teardown_request
+    def teardown_session(exception=None):
+        db.session.remove()
+
+    # ---END---
+
+    # Define boilerplate routes. Replace or delete for an actual application.
+    # ---START---
+
     @app.route("/hello")
     def hello():
         return "Hello, world!"
 
+    @app.route("/")
+    def index():
+        return render_template("landing.html")
+
+    # ---END---
+
     return app
-
-
-def clear_db():
-    """Clear a new or existing database.
-
-    Args:
-      None
-
-    Returns:
-      None
-    """
-    db.drop_all()
-    db.create_all()
-
-
-@click.command("clear-db")
-@with_appcontext
-def clear_db_command():
-    """Invoke the clear_db function.
-
-    Args:
-      None
-
-    Returns:
-      None
-    """
-    clear_db()
-    click.echo("Cleared the database.")
