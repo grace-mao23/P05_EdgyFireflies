@@ -4,16 +4,7 @@ VPYTHON := env/bin/python3
 VPIP := env/bin/pip
 
 run: setup
-	@export FLASK_APP=app
-	FLASK_ENV=development $(VPYTHON) -m flask run
-
-clear-db: setup
-ifneq ($(wildcard instance/*.sqlite),)
-	@export FLASK_APP=app
-	$(VPYTHON) -m flask clear-db
-else
-	@echo "Database does not exist"
-endif
+	$(VPYTHON) application.py
 
 test: setup
 	$(VPYTHON) -m pytest

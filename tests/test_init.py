@@ -34,30 +34,6 @@ def test_db_url_environ(monkeypatch):
     assert app.config["SQLALCHEMY_DATABASE_URI"] == "sqlite:///environ"
 
 
-def test_init_db_command(runner, monkeypatch):
-    """Test the init_db command using the Flask CLI environment.
-
-    Asserts that the a Flask CLI command is called.
-
-    Args:
-      runner: A test CLI runner for an app instance.
-      monkeypatch: A way to extend or modify the application locally.
-    
-    Returns:
-      None
-    """
-    class Recorder(object):
-        called = False
-
-    def fake_init_db():
-        Recorder.called = True
-
-    monkeypatch.setattr("app.clear_db", fake_init_db)
-    result = runner.invoke(args=["clear-db"])
-    assert "Cleared the database." in result.output
-    assert Recorder.called
-
-
 def test_hello(client):
     """Test if the /hello route is running correctly.
 
@@ -71,3 +47,4 @@ def test_hello(client):
     """
     response = client.get("/hello")
     assert response.data == b"Hello, world!"
+    
