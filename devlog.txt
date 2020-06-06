@@ -1,3 +1,6 @@
+jun taoL -- 2020-06-06 15:47
+  - Fixed dependency issue with Flask-SocketIO
+
 jun taoL -- 2020-06-05 21:53
   - Added database model classes.
   - Added friends and books blueprints.

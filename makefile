@@ -4,7 +4,7 @@ VPYTHON := env/bin/python3
 VPIP := env/bin/pip
 
 run: setup
-	$(VPYTHON) application.py
+	FLASK_ENV=development $(VPYTHON) application.py
 
 test: setup
 	$(VPYTHON) -m pytest

@@ -2,6 +2,8 @@
 
 Read and Chill: Read Your Way to Real Romance
 
+![](https://github.com/grace-mao23/P05_EdgyFireflies/workflows/CI/badge.svg)
+
 ## Roster
 
 * Grace Mao: Frontend, Project Manager
