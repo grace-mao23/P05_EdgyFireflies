@@ -60,7 +60,7 @@ def login():
             flash("Password not valid.")
         else:
             session.clear()
-            session["user_id"] = user.userId
+            session["user_id"] = user.user_id
             return redirect(url_for("index"))
 
     return render_template("login.html")

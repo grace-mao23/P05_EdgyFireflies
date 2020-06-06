@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask
+from flask import Flask, render_template
 from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 
@@ -83,7 +83,7 @@ def create_app(config=None):
 
     @app.route("/")
     def index():
-        return "Index"
+        return render_template("landing.html")
 
     # ---END---
 

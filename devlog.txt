@@ -1,3 +1,8 @@
+jun taoL -- 2020-06-05 21:53
+  - Added database model classes.
+  - Added friends and books blueprints.
+  - Added routes that would need to be implemented with the specification.
+
 jun taoL -- 2020-06-05 19:00
   - Refactor app structure.
   - Implemented authentication.

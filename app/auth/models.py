@@ -5,16 +5,16 @@ from app import db
 
 
 class User(db.Model):
-    """Define the user class.
+    """Defines the user class.
 
-    Column:
-      userId: PK
+    Columns:
+      user_id: PK
       email
       username
       password
       elo
     """
-    userId = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, unique=True, nullable=False)
     username = db.Column(db.String, unique=True, nullable=False)
     _password = db.Column("password", db.String, nullable=False)
