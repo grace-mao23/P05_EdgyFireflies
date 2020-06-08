@@ -2,6 +2,7 @@ from flask import (Blueprint, render_template, session)
 
 from app import db
 from app.auth.views import login_required
+from app.auth.models import User
 from app.books.models import SavedBook
 from app.friends.models import ChatHistory
 

@@ -52,7 +52,7 @@ def validate_register_input(auth, email, username, password, message):
     ("a", "test", b"Username not valid."),
     ("test", "a", b"Password not valid."),
 ))
-def validate_login_input(auth, username, password):
+def validate_login_input(auth, username, password, message):
     """Tests the login inputs.
 
     Args:

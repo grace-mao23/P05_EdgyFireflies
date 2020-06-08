@@ -86,12 +86,12 @@ class User(db.Model):
 
     def send_friend_request(self, user):
         """Sends a friend request to a user."""
-        if not self.friend_requests.filter(receiver_id == user.id).count() > 0:
+        if not self.friend_requests.filter(friend_requests.c.receiver_id == user.id).count() > 0:
             self.friend_requests.append(user)
 
     def accept_friend_request(self, user):
         """Accepts a friend request from a user."""
         if not self.is_friend(user) and self.friend_requests.filter(
-                sender_id == user.id).count() > 0:
+                friend_requests.c.sender_id == user.id).count() > 0:
             self.friends.append(user)
             self.friend_requests.remove(user)
