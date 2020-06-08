@@ -1,3 +1,8 @@
+jun taoL -- 2020-06-07 21:19
+  - Restructured app
+  - Added test for books blueprint
+  - Worked on books blueprint and index
+
 jun taoL -- 2020-06-06 15:47
   - Fixed dependency issue with Flask-SocketIO
 

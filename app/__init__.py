@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template
+from flask import (Flask, render_template)
 from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 
@@ -42,9 +42,11 @@ def create_app(config=None):
     # Register blueprints
     # ---START---
 
-    from app import auth
+    from app import auth, books, friends
 
     app.register_blueprint(auth.bp)
+    app.register_blueprint(books.bp)
+    app.register_blueprint(friends.bp)
 
     # ---END---
 
@@ -81,9 +83,7 @@ def create_app(config=None):
     def hello():
         return "Hello, world!"
 
-    @app.route("/")
-    def index():
-        return render_template("landing.html")
+    app.add_url_rule("/", endpoint="index")
 
     # ---END---
 

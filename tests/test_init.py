@@ -46,5 +46,23 @@ def test_hello(client):
       None
     """
     response = client.get("/hello")
+
+    assert response.status_code == 200
     assert response.data == b"Hello, world!"
     
+
+def test_landing_page(client):
+    """Test if the landing page is running correctly.
+
+    Assert whether the route is returning the correct message.
+
+    Args:
+      client: A test client for an app instance.
+
+    Returns:
+      None
+    """
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert b"<h1 class=\"display-4 font-italic\">Read and Chill</h1>" in response.data
