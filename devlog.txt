@@ -1,3 +1,6 @@
+jun taoL -- 2020-06-08 12:46
+  - Changed the database classes and mappings.
+
 jun taoL -- 2020-06-07 21:19
   - Restructured app
   - Added test for books blueprint

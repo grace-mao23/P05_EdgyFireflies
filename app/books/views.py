@@ -101,3 +101,24 @@ def update_review(book_id):
         pass
 
     return render_template("books/review.html")
+
+
+@bp.route("/settings", methods=["GET", "POST"])
+@login_required
+def settings():
+    """Updates the current user's settings.
+
+    Updatable:
+      Email
+      Password
+
+    Args:
+      None
+    
+    Returns:
+      A rendered Jinja template.
+    """
+    if request.method == "POST":
+        pass
+
+    return render_template("books/settings.html")

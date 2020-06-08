@@ -25,6 +25,7 @@ class Book(db.Model):
       year
       tags
     """
+    __table_args__ = {"extend_existing": True}
     book_id = db.Column(db.Integer, primary_key=True)
     book_name = db.Column(db.String, unique=True, nullable=False)
     author_id = db.Column(db.ForeignKey(Author.author_id), nullable=False)
@@ -58,6 +59,7 @@ class SavedBook(db.Model):
       rating
       review_id
     """
+    saved_book_id = db.Column(db.Integer, primary_key=True)
     book_id = db.Column(db.ForeignKey(Book.book_id), nullable=False)
     user_id = db.Column(db.ForeignKey(User.user_id), nullable=False)
     rating = db.Column(db.Integer, nullable=True)

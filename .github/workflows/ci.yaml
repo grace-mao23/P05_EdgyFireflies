@@ -8,17 +8,26 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        python-version: [3.5, 3.6, 3.7, 3.8]
+
+      fail-fast: true
     steps:
       - name: Checkout GitHub Action
         uses: actions/checkout@v2
-      - name: Setup Python 3.8
+      - name: Setup Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: ${{ matrix.python-version }}
       - name: Setup the application
         run: |
-          pip install -r requirements.txt
+          python -m pip install --upgrade pip
+          pip install flake8
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Lint with flake8
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
       - name: Test with pytest
         run: |
           python -m pytest
