@@ -1,13 +1,26 @@
-from flask import (Blueprint, render_template, request)
+from flask import (Blueprint, render_template, request, session, redirect,
+                   url_for)
 
 from app import db
 from app.auth.views import login_required
 
-bp = Blueprint("books",
-               __name__,
-               url_prefix="/books",
-               template_folder="templates",
-               static_folder="static")
+bp = Blueprint("books", __name__)
+
+
+@bp.route("/")
+def index():
+    """Returns the landing view for an unauthenticated user.
+
+    Args:
+      None
+
+    Returns:
+      None
+    """
+    if session.get("user_id", None) is None:
+        return render_template("landing.html")
+
+    return redirect(url_for("books.home"))
 
 
 @bp.route("/home", methods=["GET"])
@@ -16,9 +29,9 @@ def home():
     """Returns the home view for a logged in user.
 
     Elements:
-      See My Profile (To be implemented)
-      Browse Books (To be implemented)
-      Match Potential Friends (To be implemented)
+      See My Profile (See home.html)
+      Browse Books (See home.html)
+      Match Potential Friends (See home.html)
 
     Args:
       None
@@ -26,7 +39,7 @@ def home():
     Returns:
       A rendered Jinja template.
     """
-    return render_template("home.html")
+    return render_template("books/home.html")
 
 
 @bp.route("/browse", methods=["GET", "POST"])
@@ -46,7 +59,7 @@ def browse():
     if request.method == "POST":
         pass
 
-    return render_template("browse.html")
+    return render_template("books/browse.html")
 
 
 @bp.route("/review/<int:book_id>", methods=["GET"])
@@ -66,7 +79,7 @@ def get_review(book_id):
     Returns:
       A rendered Jinja template.
     """
-    return render_template("review.html")
+    return render_template("books/review.html")
 
 
 @bp.route("/review/<int:book_id>/update", methods=["POST"])
@@ -87,4 +100,4 @@ def update_review(book_id):
     if request.method == "POST":
         pass
 
-    return render_template("review.html")
+    return render_template("books/review.html")

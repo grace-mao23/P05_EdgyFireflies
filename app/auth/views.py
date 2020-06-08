@@ -8,8 +8,7 @@ from app.auth.models import User
 
 bp = Blueprint("auth",
                __name__,
-               url_prefix="/auth",
-               template_folder="templates")
+               url_prefix="/auth")
 
 # Define middlewares
 # ---START---
@@ -63,7 +62,7 @@ def login():
             session["user_id"] = user.user_id
             return redirect(url_for("index"))
 
-    return render_template("login.html")
+    return render_template("auth/login.html")
 
 
 @bp.route("/register", methods=["GET", "POST"])
@@ -98,7 +97,7 @@ def register():
             db.session.commit()
             return redirect(url_for("auth.login"))
 
-    return render_template("register.html")
+    return render_template("auth/register.html")
 
 
 @bp.route("/logout", methods=["GET"])

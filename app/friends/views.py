@@ -3,11 +3,9 @@ from flask import (Blueprint, render_template)
 from app import db
 from app.auth.views import login_required
 
-bp = Blueprint("friend",
+bp = Blueprint("friends",
                __name__,
-               url_prefix="/friend",
-               template_folder="templates",
-               static_folder="static")
+               url_prefix="/friend")
 
 # Define matching algorithm
 # ---START---
@@ -48,7 +46,7 @@ def get_profile():
     Returns:
       A rendered Jinja template.
     """
-    return render_template("profile.html")
+    return render_template("friends/profile.html")
 
 
 @bp.route("/match", methods=["GET"])
@@ -65,7 +63,7 @@ def match():
     Returns:
       A rendered Jinja template.
     """
-    return render_template("match.html")
+    return render_template("friends/match.html")
 
 
 @bp.route("/chat/<int:session_id>", methods=["GET"])
@@ -81,4 +79,4 @@ def chat(session_id):
     Returns:
       A rendered Jinja template.
     """
-    return render_template("chat.html")
+    return render_template("friends/chat.html")
