@@ -49,7 +49,7 @@ env/bin/pip install -r requirements.txt
 3. Run the application.
 
 ```bash
-env/bin/python application.py
+FLASK_ENV=development env/bin/python application.py
 ```
 
 ## Unit Tesing
