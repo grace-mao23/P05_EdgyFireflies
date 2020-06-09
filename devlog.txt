@@ -1,3 +1,7 @@
+tammyC -- 2020-06-08 23:01
+  - started working on frontend profile of individual user.
+  - added filler template for profile page.
+
 jun taoL -- 2020-06-08 12:46
   - Changed the database classes and mappings.
 
