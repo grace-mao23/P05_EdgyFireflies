@@ -35,24 +35,24 @@ class Book(db.Model):
     tags = db.Column(db.String, nullable=True)
 
 
-class Review(db.Model):
-    """Defines the Review class.
-
-    Columns:
-      review_id: PK
-      user_id: FK
-      review
-      upvote
-    """
-    review_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey(User.user_id), nullable=False)
-    review = db.Column(db.String, nullable=False)
-    upvote = db.Column(db.Integer, nullable=True)
+# class Review(db.Model):
+#     """Defines the Review class.
+#
+#     Columns:
+#       review_id: PK
+#       user_id: FK
+#       review
+#       upvote
+#     """
+#     review_id = db.Column(db.Integer, primary_key=True)
+#     user_id = db.Column(db.ForeignKey(User.user_id), nullable=False)
+#     review = db.Column(db.String, nullable=False)
+#     upvote = db.Column(db.Integer, nullable=True)
 
 
 class SavedBook(db.Model):
     """Defines the SavedBook class.
-    
+
     Columns:
       book_id: FK
       user_id: FK
@@ -63,4 +63,3 @@ class SavedBook(db.Model):
     book_id = db.Column(db.ForeignKey(Book.book_id), nullable=False)
     user_id = db.Column(db.ForeignKey(User.user_id), nullable=False)
     rating = db.Column(db.Integer, nullable=True)
-    review_id = db.Column(db.ForeignKey(Review.review_id), nullable=False)

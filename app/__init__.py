@@ -3,6 +3,8 @@ import os
 from flask import (Flask, render_template)
 from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
+from app.forms import SearchForm
+
 
 # Created SQLAlchemy object, but is not binded to any Flask application
 db = SQLAlchemy()
@@ -15,7 +17,7 @@ def create_app(config=None):
     """Create and configure a Flask app.
     Args:
       config: A test configuration object.
-    
+
     Returns:
       A Flask application instance.
     """
@@ -85,6 +87,38 @@ def create_app(config=None):
 
     app.add_url_rule("/", endpoint="index")
 
+    @app.route("/search", methods=['GET', 'POST'])
+    def search():
+        SEARCH_LIMIT = 100
+        PER_ROW = 3
+
+        form = SearchForm()
+
+        full_results = None
+
+        if form.validate_on_submit():
+            url = "http://openlibrary.org/search.json?q=" + str(form.search.data)
+            results = ["f"]
+
+            # cut results off
+            results = results[:SEARCH_LIMIT]
+
+            # pad results
+            while len(results) % PER_ROW != 0:
+                results.append(None)
+
+            full_results = []
+
+            print(full_results)
+
+            for i in range(len(results) // PER_ROW):
+                full_results.append(results[i * PER_ROW:(i + 1) * PER_ROW])
+
+        return render_template('search.html',
+                               form=form,
+                               query=form.search.data,
+                               limit=SEARCH_LIMIT,
+                               results=full_results)
     # ---END---
 
     return app
