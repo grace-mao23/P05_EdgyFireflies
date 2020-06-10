@@ -15,7 +15,7 @@ def create_app(config=None):
     """Create and configure a Flask app.
     Args:
       config: A test configuration object.
-    
+
     Returns:
       A Flask application instance.
     """
