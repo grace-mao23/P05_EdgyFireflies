@@ -32,6 +32,7 @@ class User(db.Model):
     email = db.Column(db.String, unique=True, nullable=False)
     username = db.Column(db.String, unique=True, nullable=False)
     _password = db.Column("password", db.String, nullable=False)
+    email = db.Column(db.String, unique=True, nullable=False)
     friends = db.relationship(
         "User",
         secondary=friends,
@@ -55,7 +56,7 @@ class User(db.Model):
     @password.setter
     def password(self, given_password):
         """Hash the given password
-        
+
         Args:
           self: The User class.
           given_password: A given password.

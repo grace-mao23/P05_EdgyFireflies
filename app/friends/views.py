@@ -41,18 +41,23 @@ def get_profile():
       Show Recent Messages (To be implemented)
       Show Friends
       Show Reading List
-    
+
     Args:
       None
-    
+
     Returns:
       A rendered Jinja template.
     """
     friends = User.query.get(session.get("user_id")).friends
+    username = User.query.get(session.get("user_id")).username
+    email = User.query.get(session.get("user_id")).email
+
     reading_list = SavedBook.query.filter_by(
         user_id=session.get("user_id")).all()
 
     return render_template("friends/profile.html",
+                           username = username,
+                           email = email,
                            friends=friends,
                            reading_list=reading_list)
 
@@ -85,7 +90,7 @@ def chat(session_id):
 
     Args:
       None
-    
+
     Returns:
       A rendered Jinja template.
     """
