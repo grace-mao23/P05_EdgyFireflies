@@ -4,6 +4,9 @@ from flask import (Flask, render_template)
 from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 from app.forms import SearchForm
+from urllib.request import urlopen
+import urllib.request as urllib
+import json
 
 
 # Created SQLAlchemy object, but is not binded to any Flask application
@@ -68,7 +71,6 @@ def create_app(config=None):
         pass
 
     # ---END---
-
     # Define middlewares
     # ---START---
 
@@ -97,7 +99,27 @@ def create_app(config=None):
         full_results = None
 
         if form.validate_on_submit():
-            url = "http://openlibrary.org/search.json?q=" + str(form.search.data)
+            #1st api
+            data = '+'.join(form.search.data.split(' '))
+            url = "http://openlibrary.org/search.json?q=" + str(data)
+            hdr = {
+                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+                'Accept-Encoding': 'none',
+                'Accept-Language': 'en-US,en;q=0.8',
+                'Connection': 'keep-alive'
+            }
+            req = urllib.Request(url, headers=hdr)
+            isbn = json.loads(urllib.urlopen(req).read())['docs'][0]['isbn'][0]
+            #2nd api
+            url_2 = "https://openlibrary.org/api/books?bibkeys=ISBN:" + str(isbn) + "&jscmd=data&format=json"
+            req = urllib.Request(url_2, headers=hdr)
+            data = json.loads(urllib.urlopen(req).read())["ISBN:"+str(isbn)]
+            if "cover" in data.keys():
+                data = data["cover"]["medium"]
+                print(data)
+
             results = ["f"]
 
             # cut results off

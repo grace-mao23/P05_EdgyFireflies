@@ -1,3 +1,11 @@
+josephL -- 2020-06-10 15:02
+  - finished basic search function
+  - adjusted sql model relationships
+  - found two book apis that work in tandem
+
+josephL -- 2020-06-09 11:01
+  - created search app route
+  - researched on book apis because google api wasnts the best for what we wanted
 tammyC -- 2020-06-08 23:01
   - started working on frontend profile of individual user.
   - added filler template for profile page.
