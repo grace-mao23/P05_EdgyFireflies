@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!--Bootstrap CSS-->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+  <!--Fira Code-->
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Fira Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+  </style>
+
+  <title>{% block title %}{% endblock %}</title>
+</head>
+
+<body class="d-flex flex-column vh-100">
+  <div class="container my-2">
+    {% block header %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom mb-3">
+      <a class=" navbar-brand text-muted font-weight-bold" href="{{ url_for('books.index') }}">Read and Chill</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        {% block navigation %}
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link text-muted" href="{{ url_for('auth.login') }}">Sign in</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-muted" href="{{ url_for('auth.register') }}">Sign up</a>
+          </li>
+        </ul>
+        {% endblock %}
+      </div>
+    </nav>
+    {% endblock %}
+    {% block content %}
+    {% for message in get_flashed_messages() %}
+    <div class="flash alert alert-primary" role="alert">{{ message }}</div>
+    {% endfor %}
+    {% endblock %}
+    {% block footer %}
+  </div>
+  <footer class="mt-auto py-3 bg-light">
+    <div>
+      <p class="container text-muted">&copy; Copyright 2020 Edgy Fireflies</p>
+    </div>
+  </footer>
+  {% endblock %}
+
+  <!-- Bootstrap JS, Popper.js, and jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+    integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+    crossorigin="anonymous"></script>
+
+  {% block morescripts %}
+  {% endblock %}
+</body>
+
+</html>
