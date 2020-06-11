@@ -9,7 +9,14 @@ from typing import Union
 # Created SQLAlchemy object, SocketIO object
 db: SQLAlchemy = SQLAlchemy()
 socketio: SocketIO = SocketIO()
-service: Resource
+
+# Define Google API client
+api_key: Union[str, None] = os.environ.get("GOOGLE_BOOKS_API_KEY", None)
+
+if api_key is None:
+    raise ValueError("Missing API key")
+
+service: Resource = build("books", "v1", developerKey=api_key)
 
 
 def create_app(config: dict = None) -> Flask:
@@ -73,12 +80,5 @@ def create_app(config: dict = None) -> Flask:
     # Define boilerplate routes. Replace or delete for an actual application.
 
     app.add_url_rule("/", endpoint="index")
-
-    # Build a service object for Google Books API.
-    # An API key would increase the API call quota.
-
-    api_key: Union[str, None] = os.environ.get("GOOGLE_BOOKS_API_KEY", None)
-
-    service = build("book", "v1", developerKey=api_key)
 
     return app

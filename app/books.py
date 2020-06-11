@@ -1,4 +1,8 @@
+import os
+import json
+
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+from googleapiclient.discovery import build, Resource
 from typing import Union
 
 from app import db, service
@@ -62,6 +66,8 @@ def browse():
 
         if books[0] is None:
             books.pop(0)
+            tokens: Union[list, None] = bookname.split().sort(reverse=True)
+
             for token in bookname.split():
                 books += Book.query.filter(
                     Book.bookname.contains(token.lower())).all()
@@ -85,12 +91,13 @@ def lookup_book():
     if request.method == "POST":
         book_title: str = request.form["book_title"]
 
-        books = service.volumes.list(intitle=book_title).execute()
+        books = service.volumes().list(
+            q=f"intitle={book_title}").execute().get("items", None)
 
     return render_template("books/lookup.html", books=books)
 
 
-@bp.route("/add", methods=["POST"])
+@bp.route("/add", methods=["GET"])
 def add_book():
     """
     Add a book to the database
@@ -99,4 +106,31 @@ def add_book():
 
     :returns: Redirection
     """
+    given_book: Union[
+        dict, str,
+        None] = request.args["book"] if request.args["book"] != "" else None
+
+    if request is None:
+        return redirect(url_for("books.lookup_book"))
+    else:
+        given_book = json.loads(given_book)
+
+        bookname = given_book["volumeInfo"]["title"]
+        author = ",".join(given_book["volumeInfo"]["authors"])
+        isbn = given_book["volumeInfo"]["industryIdentifiers"][0]["identifier"]
+        description = given_book.get("volumeInfo",
+                                     None).get("description", None)
+        categories = ",".join(
+            given_book["volumeInfo"]["categories"]) if given_book.get(
+                "volumeInfo", None).get("categories",
+                                        None) is not None else None
+
+        db.session.add(
+            Book(bookname=bookname,
+                 author=author,
+                 isbn=isbn,
+                 description=description,
+                 categories=categories))
+        db.session.commit()
+
     return redirect(url_for("index"))

@@ -34,15 +34,18 @@
         </span>
       </div>
       <input class="form-control" name="book_title" id="book_title" placeholder="Book Title" required>
+      <div class="input-group-append">
+        <button type="submit" class="btn btn-primary">Search</button>
+      </div>
     </div>
   </div>
-  <button type="submit" class="btn btn-primary">Add Book</button>
 </form>
 {% if books %}
 <div class="container">
   <ul class="list-group">
     {% for book in books %}
-    <a href="#" class="list-group-item list-group-item-action">{{ book.volumeInfo.title }}</a>
+    <a href="{{ url_for('books.add_book', book=book|tojson|safe) }}"
+      class="list-group-item list-group-item-action">{{ book.volumeInfo.title }}</a>
     {% endfor %}
   </ul>
 </div>

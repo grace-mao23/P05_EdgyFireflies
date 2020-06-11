@@ -60,5 +60,9 @@ class Book(db.Model):
     :attribute Column id: The book ID
     :attribute Column bookname: The book's name
     """
-    id = db.Column(db.Integer, primary_key=True)
-    bookname = db.Column(db.String, unique=True, nullable=False)
+    id: db.Column = db.Column(db.Integer, primary_key=True)
+    bookname: db.Column = db.Column(db.String, unique=True, nullable=False)
+    author: db.Column = db.Column(db.String, nullable=False)
+    isbn: db.Column = db.Column(db.String, unique=True, nullable=False)
+    description: db.Column = db.Column(db.String, nullable=True)
+    categories: db.Column = db.Column(db.String, nullable=True)
