@@ -32,7 +32,7 @@ class User(db.Model):
     email = db.Column(db.String, unique=True, nullable=False)
     username = db.Column(db.String, unique=True, nullable=False)
     _password = db.Column("password", db.String, nullable=False)
-    email = db.Column(db.String, unique=True, nullable=False)
+    bio = db.Column(db.String, unique=True, nullable=True)
     friends = db.relationship(
         "User",
         secondary=friends,

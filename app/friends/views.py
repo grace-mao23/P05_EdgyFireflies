@@ -51,6 +51,8 @@ def get_profile():
     friends = User.query.get(session.get("user_id")).friends
     username = User.query.get(session.get("user_id")).username
     email = User.query.get(session.get("user_id")).email
+    bio = User.query.get(session.get("user_id")).bio
+
 
     reading_list = SavedBook.query.filter_by(
         user_id=session.get("user_id")).all()
@@ -59,7 +61,8 @@ def get_profile():
                            username = username,
                            email = email,
                            friends=friends,
-                           reading_list=reading_list)
+                           reading_list=reading_list,
+                           bio=bio)
 
 
 @bp.route("/match", methods=["GET"])
