@@ -89,58 +89,7 @@ def create_app(config=None):
 
     app.add_url_rule("/", endpoint="index")
 
-    @app.route("/search", methods=['GET', 'POST'])
-    def search():
-        SEARCH_LIMIT = 100
-        PER_ROW = 3
 
-        form = SearchForm()
-
-        full_results = None
-
-        if form.validate_on_submit():
-            #1st api
-            data = '+'.join(form.search.data.split(' '))
-            url = "http://openlibrary.org/search.json?q=" + str(data)
-            hdr = {
-                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-                'Accept-Encoding': 'none',
-                'Accept-Language': 'en-US,en;q=0.8',
-                'Connection': 'keep-alive'
-            }
-            req = urllib.Request(url, headers=hdr)
-            isbn = json.loads(urllib.urlopen(req).read())['docs'][0]['isbn'][0]
-            #2nd api
-            url_2 = "https://openlibrary.org/api/books?bibkeys=ISBN:" + str(isbn) + "&jscmd=data&format=json"
-            req = urllib.Request(url_2, headers=hdr)
-            data = json.loads(urllib.urlopen(req).read())["ISBN:"+str(isbn)]
-            if "cover" in data.keys():
-                data = data["cover"]["medium"]
-                print(data)
-
-            results = ["f"]
-
-            # cut results off
-            results = results[:SEARCH_LIMIT]
-
-            # pad results
-            while len(results) % PER_ROW != 0:
-                results.append(None)
-
-            full_results = []
-
-            print(full_results)
-
-            for i in range(len(results) // PER_ROW):
-                full_results.append(results[i * PER_ROW:(i + 1) * PER_ROW])
-
-        return render_template('search.html',
-                               form=form,
-                               query=form.search.data,
-                               limit=SEARCH_LIMIT,
-                               results=full_results)
     # ---END---
 
     return app

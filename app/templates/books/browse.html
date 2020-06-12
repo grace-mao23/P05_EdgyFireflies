@@ -2,16 +2,57 @@
 
 {% block title %}Read and Chill | Browse{% endblock %}
 
-{% block navigation %}
-<ul class="navbar-nav ml-auto">
-  <li class="nav-item">
-    <a class="nav-link text-muted" href="{{ url_for('books.home') }}">Home</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link text-muted" href="{{ url_for('books.settings') }}">Settings</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link text-muted" href="{{ url_for('auth.logout') }}">Sign out</a>
-  </li>
-</ul>
-{% endblock %}
+{% from "./books/render_forms.html" import form_field %}
+
+{% block style %}
+<style>
+    .no-bullets ul {
+        list-style-type: none;
+        display: inline-block;
+    }
+</style>
+
+{% endblock style %}
+
+{% block content %}
+<h3>Welcome to the search!</h3>
+
+<form method="POST">
+    {{ form.csrf_token }}
+    {{ form_field(form.search) }}
+    {{ form_field(form.submit) }}
+</form>
+
+<hr>
+
+{% if results is not none %}
+
+<p>Search results for: {{ query }}</p>
+
+{% for card_list in results %}
+
+<div class="row">
+    {% for card in card_list %}
+
+    <div class="col">
+        {% if card is not none %}
+        card
+        {% endif %}
+
+    </div>
+
+    {% endfor %}
+
+</div><br>
+
+
+{% endfor %}
+
+{% if results == [] %}
+<br><br><br>
+<p class="text-center"><em>No cards found!</em></p>
+{% endif %}
+
+{% endif %}
+
+{% endblock content %}
