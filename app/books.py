@@ -7,7 +7,7 @@ from typing import Union
 
 from app import db, service
 from .auth import login_required
-from .models import Book, User
+from .models import Book, User, SavedBook
 
 bp: Blueprint = Blueprint("books", __name__)
 
@@ -106,18 +106,12 @@ def add_book():
 
     :returns: Redirection
     """
-    given_book: Union[
-        dict, str,
-        None] = request.args["book"] if request.args["book"] != "" else None
+    given_book: Union[dict, None] = json.loads(
+        request.args["book"]) if request.args["book"] != "" else None
 
     if request is None:
         return redirect(url_for("books.lookup_book"))
     else:
-        given_book = json.loads(given_book)
-
-        bookname = given_book["volumeInfo"]["title"]
-        author = ",".join(given_book["volumeInfo"]["authors"])
-        isbn = given_book["volumeInfo"]["industryIdentifiers"][0]["identifier"]
         description = given_book.get("volumeInfo",
                                      None).get("description", None)
         categories = ",".join(
@@ -125,12 +119,71 @@ def add_book():
                 "volumeInfo", None).get("categories",
                                         None) is not None else None
 
-        db.session.add(
-            Book(bookname=bookname,
-                 author=author,
-                 isbn=isbn,
-                 description=description,
-                 categories=categories))
+        book: Book = Book(bookname=given_book["volumeInfo"]["title"],
+                          author=",".join(given_book["volumeInfo"]["authors"]),
+                          isbn=given_book["volumeInfo"]["industryIdentifiers"]
+                          [0]["identifier"],
+                          description=description,
+                          categories=categories)
+        db.session.add(book)
         db.session.commit()
 
-    return redirect(url_for("index"))
+        user: User = User.query.filter_by(
+            id=session.get("user_id")).first_or_404()
+
+        saved_book: SavedBook = SavedBook(book_id=book.id, user_id=user.id)
+
+        db.session.add(saved_book)
+        db.session.commit()
+
+    return redirect(url_for("books.book", id=book.id))
+
+
+@bp.route("/book/<int:id>", methods=["GET"])
+def book(id: int):
+    """
+    See the details of a book.
+
+    :param int id: The book ID
+
+    :returns: Render template
+    """
+    book: Book = Book.query.filter_by(id=id).first_or_404()
+
+    bookname: str = book.bookname
+    author: list = book.author.split(",")
+    isbn: str = book.isbn
+    description: Union[
+        list, None] = book.description if book.description != None else None
+    categories: Union[list, None] = book.categories.split(
+        ",") if book.categories != None else None
+
+    return render_template("books/book.html",
+                           bookname=bookname,
+                           author=author,
+                           isbn=isbn,
+                           description=description,
+                           categories=categories)
+
+
+@bp.route("/mybooks", methods=["GET"])
+def my_books():
+    """
+    Show all the books of a given user.
+
+    :param: None
+
+    :returns: Render template
+    """
+    user: User = User.query.filter_by(id=session.get("user_id")).first_or_404()
+
+    saved_books: Union[list, None] = SavedBook.query.filter_by(
+        user_id=user.id).all()
+
+    if saved_books is None:
+        return redirect(url_for("index"))
+
+    for i, saved_book in enumerate(saved_books):
+        saved_books[i] = Book.query.filter_by(id=saved_book.book_id).first()
+
+    return render_template("books/mybooks.html", saved_books=saved_books)

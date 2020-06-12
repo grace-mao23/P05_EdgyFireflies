@@ -42,7 +42,8 @@
 <div class="container">
   <ul class="list-group">
     {% for book in books %}
-    <a href="#" class="list-group-item list-group-item-action">{{ book.bookname }}</a>
+    <a href="{{ url_for('books.book', id=book.id) }}"
+      class="list-group-item list-group-item-action">{{ book.bookname }}</a>
     {% endfor %}
   </ul>
 </div>

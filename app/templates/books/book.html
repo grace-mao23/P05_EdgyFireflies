@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Read and Chill | {{ bookname }}{% endblock %}
+
+{% block navigation %}
+<ul class="navbar-nav ml-auto">
+  <li class="nav-item">
+    <a class="nav-link text-muted" href="{{ url_for('books.home') }}">Home</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link text-muted" href="{{ url_for('auth.settings') }}">Settings</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link text-muted" href="{{ url_for('auth.logout') }}">Sign out</a>
+  </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="card text-white bg-dark">
+  <div class="card-header">
+    <h3 class="font-italic mt-2">{{ bookname }}</h3>
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">{{ author|join(', ') }}</h5>
+    {% if description %}
+    <p class="card-text">{{ description }}</p>
+    {% endif %}
+    <p class="card-text d-flex flex-column">
+      {% if categories %}
+      <span class="text-muted d-flex flex-row mb-1">
+        {% for category in categories %}
+        <span class="badge badge-primary">{{ category }}</span>
+        {% endfor %}
+      </span>
+      {% endif %}
+      <small class="text-muted">ISBN: {{ isbn }}</small>
+    </p>
+  </div>
+</div>
+{% endblock %}

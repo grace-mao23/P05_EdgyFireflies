@@ -6,7 +6,7 @@ from app import db
 
 class User(db.Model):
     """
-    Defines the user class.
+    Define the user class.
 
     :attribute Column id: The user ID
     :attribute Column username: The user's username
@@ -15,7 +15,9 @@ class User(db.Model):
     """
     id: db.Column = db.Column(db.Integer, primary_key=True)
     username: db.Column = db.Column(db.String, unique=True, nullable=False)
-    display_name: db.Column = db.Column(db.String, unique=True, nullable=False)
+    display_name: db.Column = db.Column(db.String,
+                                        unique=False,
+                                        nullable=False)
     _password: db.Column = db.Column("password", db.String, nullable=False)
 
     @hybrid_property
@@ -55,10 +57,14 @@ class User(db.Model):
 
 class Book(db.Model):
     """
-    Defines the book class.
-
+    Define the book class.
+  
     :attribute Column id: The book ID
     :attribute Column bookname: The book's name
+    :attribute Column author: The author name(s)
+    :attribute Column isbn: ISBN
+    :attribute Column description: The book description
+    :attribute Column categories: The book categories
     """
     id: db.Column = db.Column(db.Integer, primary_key=True)
     bookname: db.Column = db.Column(db.String, unique=True, nullable=False)
@@ -66,3 +72,20 @@ class Book(db.Model):
     isbn: db.Column = db.Column(db.String, unique=True, nullable=False)
     description: db.Column = db.Column(db.String, nullable=True)
     categories: db.Column = db.Column(db.String, nullable=True)
+
+
+class SavedBook(db.Model):
+    """
+    Define the saved book class.
+
+    :attribute Column id: The saved book ID
+    :attribute Column book_id: The book ID
+    :attribute Column user_id: The user ID 
+    """
+    id: db.Column = db.Column(db.Integer, primary_key=True)
+    book_id: db.Column = db.Column(db.Integer,
+                                   db.ForeignKey("book.id"),
+                                   nullable=False)
+    user_id: db.Column = db.Column(db.Integer,
+                                   db.ForeignKey("user.id"),
+                                   nullable=False)

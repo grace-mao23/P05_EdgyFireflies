@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Read and Chill | My Books{% endblock %}
+
+{% block navigation %}
+<ul class="navbar-nav ml-auto">
+  <li class="nav-item">
+    <a class="nav-link text-muted" href="{{ url_for('books.home') }}">Home</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link text-muted" href="{{ url_for('auth.settings') }}">Settings</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link text-muted" href="{{ url_for('auth.logout') }}">Sign out</a>
+  </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+{% if saved_books %}
+<div class="bg-dark text-white rounded px-3 mb-3">
+  <h3 class="py-3">My Saved Books</h3>
+</div>
+<ul class="list-group">
+  {% for book in saved_books %}
+  <a href="{{ url_for('books.book', id=book.id) }}"
+    class="list-group-item list-group-item-action">{{ book.bookname }}</a>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

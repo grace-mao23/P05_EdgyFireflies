@@ -1,10 +1,11 @@
 import os
 
-from flask import Flask, render_template
+from flask import Flask, flash, redirect, url_for
 from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 from googleapiclient.discovery import build, Resource
 from typing import Union
+from werkzeug.exceptions import BadRequest
 
 # Created SQLAlchemy object, SocketIO object
 db: SQLAlchemy = SQLAlchemy()
@@ -80,5 +81,12 @@ def create_app(config: dict = None) -> Flask:
     # Define boilerplate routes. Replace or delete for an actual application.
 
     app.add_url_rule("/", endpoint="index")
+
+    # Define error handling
+
+    @app.errorhandler(BadRequest)
+    def handle_bad_request():
+        flash("An error has occurred. Please try again.")
+        return redirect(url_for("index"))
 
     return app
