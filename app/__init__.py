@@ -5,7 +5,6 @@ from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 from googleapiclient.discovery import build, Resource
 from typing import Union
-from werkzeug.exceptions import BadRequest
 
 # Created SQLAlchemy object, SocketIO object
 db: SQLAlchemy = SQLAlchemy()
@@ -84,8 +83,8 @@ def create_app(config: dict = None) -> Flask:
 
     # Define error handling
 
-    @app.errorhandler(BadRequest)
-    def handle_bad_request():
+    @app.errorhandler(404)
+    def handle_404_not_found():
         flash("An error has occurred. Please try again.")
         return redirect(url_for("index"))
 

@@ -7,6 +7,7 @@ bp: Blueprint = Blueprint("friends", __name__, url_prefix="/friends")
 
 
 @bp.route("/profile", methods=["GET"])
+@login_required
 def profile():
     """
     Return the profile view of a logged in user.

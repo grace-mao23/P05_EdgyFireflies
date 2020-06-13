@@ -17,6 +17,7 @@
 {% endblock %}
 
 {% block content %}
+{{ super() }}
 <form class="container" method="post">
   <div class="form-group">
     <div class="input-group">
@@ -42,9 +43,9 @@
 <div class="container">
   <ul class="list-group">
     {% for book in books %}
-    <form class="d-flex flex-row justify-content-between list-group-item" action="{{ url_for('books.save_book') }}" ,
+    <form class="d-flex flex-row justify-content-between list-group-item" action="{{ url_for('books.save_book') }}"
       method="POST">
-      <span class="font-italic">{{ book.bookname }} by {{ book.author }}</span>
+      <span class="font-italic mt-1">{{ book.bookname }} by {{ book.author }}</span>
       <input type="hidden" name="book_id" value="{{ book.id }}">
       <button type="submit" class="btn btn-outline-secondary">
         <svg class="bi bi-heart" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor"

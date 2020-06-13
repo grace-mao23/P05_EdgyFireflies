@@ -17,8 +17,9 @@
 {% endblock %}
 
 {% block content %}
+{{ super() }}
 {% if saved_books %}
-<div class="bg-dark text-white rounded px-3 mb-3">
+<div class="bg-dark text-white rounded shadow-sm px-3 mb-3">
   <h3 class="py-3">My Saved Books</h3>
 </div>
 <ul class="list-group">

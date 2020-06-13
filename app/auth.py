@@ -39,8 +39,12 @@ def login():
     :returns: A redirection to index or the login page
     """
     if request.method == "POST":
-        username: str = request.form["username"]
-        password: str = request.form["password"]
+        username: Union[str, None] = request.form.get("username", None)
+        password: Union[str, None] = request.form.get("password", None)
+
+        if username is None and password is None:
+            flash("Malformed request.")
+            return redirect(url_for("index"))
 
         user: User = User.query.filter_by(username=username).first()
 
@@ -69,9 +73,13 @@ def register():
     :returns: A redirection or render template
     """
     if request.method == "POST":
-        username: str = request.form["username"]
-        display_name: str = request.form["display_name"]
-        password: str = request.form["password"]
+        username: Union[str, None] = request.form.get("username", None)
+        display_name: Union[str, None] = request.form.get("display_name", None)
+        password: Union[str, None] = request.form.get("password", None)
+
+        if all(map(lambda x: x is None, (username, display_name, password))):
+            flash("Malformed request.")
+            return redirect(url_for("index"))
 
         if not username:
             flash("Username is missing.")
@@ -94,6 +102,7 @@ def register():
 
 
 @bp.route("/logout", methods=["GET"])
+@login_required
 def logout():
     """
     Log out the user in session.
@@ -107,6 +116,7 @@ def logout():
 
 
 @bp.route("/settings", methods=["GET", "POST"])
+@login_required
 def settings():
     """
     Update the current user's settings.

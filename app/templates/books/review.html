@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Read and Chill | Review {{ bookname }}{% endblock %}
+
+{% block navigation %}
+<ul class="navbar-nav ml-auto">
+  <li class="nav-item">
+    <a class="nav-link text-muted" href="{{ url_for('books.home') }}">Home</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link text-muted" href="{{ url_for('auth.settings') }}">Settings</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link text-muted" href="{{ url_for('auth.logout') }}">Sign out</a>
+  </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+{{ super() }}
+<div class="bg-dark text-white rounded px-3 mb-3 shadow-sm">
+  <h3 class="py-3">Create a Review</h3>
+</div>
+<form class="d-flex flex-column" method="POST">
+  <div class="form-group">
+    <label for="rating">Rating</label>
+    <input type="number" class="form-control" id="rating" min="0" max="5" step="0.01" required>
+  </div>
+  <div class="form-group">
+    <label for="review">Review</label>
+    <textarea class="form-control" id="review" rows="7" autocomplete="on" maxlength="1024" required></textarea>
+  </div>
+  <button type="submit" class="ml-auto btn btn-primary">Submit</button>
+</form>
+{% endblock %}

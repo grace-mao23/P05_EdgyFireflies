@@ -65,6 +65,7 @@ class Book(db.Model):
     :attribute Column isbn: ISBN
     :attribute Column description: The book description
     :attribute Column categories: The book categories
+    :attribute Column average_rating: The book's user generated average rating
     """
     id: db.Column = db.Column(db.Integer, primary_key=True)
     bookname: db.Column = db.Column(db.String, unique=True, nullable=False)
@@ -72,6 +73,8 @@ class Book(db.Model):
     isbn: db.Column = db.Column(db.String, unique=True, nullable=False)
     description: db.Column = db.Column(db.String, nullable=True)
     categories: db.Column = db.Column(db.String, nullable=True)
+    average_rating: db.Column = db.Column(db.Integer, nullable=True)
+    total_ratings: db.Column = db.Column(db.Integer, nullable=True)
 
 
 class SavedBook(db.Model):
@@ -80,7 +83,9 @@ class SavedBook(db.Model):
 
     :attribute Column id: The saved book ID
     :attribute Column book_id: The book ID
-    :attribute Column user_id: The user ID 
+    :attribute Column user_id: The user ID
+    :attribute Column rating: The user's rating for the saved book
+    :attribute Column review: The user's written review for the saved book
     """
     id: db.Column = db.Column(db.Integer, primary_key=True)
     book_id: db.Column = db.Column(db.Integer,
@@ -89,3 +94,5 @@ class SavedBook(db.Model):
     user_id: db.Column = db.Column(db.Integer,
                                    db.ForeignKey("user.id"),
                                    nullable=False)
+    rating: db.Column = db.Column(db.Integer, nullable=True)
+    review: db.Column = db.Column(db.String, nullable=True)

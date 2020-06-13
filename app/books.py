@@ -19,7 +19,7 @@ def index():
     
     :param None:
     
-    :returns: A redirection or render template
+    :return: A redirection or render template
     """
     if session.get("user_id", None) is None:
         return render_template("landing.html")
@@ -27,7 +27,7 @@ def index():
     return redirect(url_for("books.home"))
 
 
-@bp.route("/home", methods=["GET", "POST"])
+@bp.route("/home", methods=["GET"])
 @login_required
 def home():
     """
@@ -35,7 +35,7 @@ def home():
 
     :param None:
     
-    :returns: Render template
+    :return: Render template
     """
     user: User = User.query.filter_by(id=session.get("user_id")).first_or_404()
 
@@ -54,14 +54,18 @@ def browse():
 
     :param None:
     
-    :returns: Render template
+    :return: Render template
     """
     books: Union[list, None] = None
 
     if request.method == "POST":
         books = []
 
-        bookname: str = request.form["search_book"]
+        bookname: Union[str, None] = request.form.get("search_book", None)
+
+        if bookname is None:
+            flash("Invalid request.")
+            return redirect(url_for("books.browse"))
 
         books += Book.query.filter(Book.bookname.contains(
             bookname.lower())).limit(10).all()
@@ -96,12 +100,27 @@ def browse():
                     ["categories"]) if book["volumeInfo"].get(
                         "categories", None) is not None else None
 
-                possible_book: Union[Book, None] = Book.query.filter_by(
-                    isbn=isbn).first() if isbn is not None else None
+                if book_title is not None and db.session.query(
+                        Book.query.filter_by(
+                            bookname=book_title).exists()).scalar():
+                    fetched_books[i] = Book.query.filter_by(
+                        bookname=book_title).first_or_404()
+                    continue
 
-                if possible_book is None and all(
-                        map(lambda x: x is not None,
-                            (book_title, author, isbn))):
+                if author is not None and db.session.query(
+                        Book.query.filter_by(author=author).exists()).scalar():
+                    fetched_books[i] = Book.query.filter_by(
+                        author=author).first_or_404()
+                    continue
+
+                if isbn is not None and db.session.query(
+                        Book.query.filter_by(bookname=isbn).exists()).scalar():
+                    fetched_books[i] = Book.query.filter_by(
+                        isbn=isbn).first_or_404()
+                    continue
+
+                if all(map(lambda x: x is not None,
+                           (book_title, author, isbn))):
                     created_book: Book = Book(bookname=book_title,
                                               author=author,
                                               isbn=isbn,
@@ -112,18 +131,22 @@ def browse():
                     db.session.commit()
 
                     fetched_books[i] = created_book
-                else:
-                    fetched_books[i] = possible_book
 
             books += fetched_books
-            books = [book for book in books if book is not None]
+            books = [
+                book for book in books
+                if book is not None and not isinstance(book, dict)
+            ]
+            print(books)
             books = list(set(books))
+            print(books)
             books = books[:10]
 
     return render_template("books/browse.html", books=books)
 
 
 @bp.route("/save", methods=["POST"])
+@login_required
 def save_book():
     """
     Save a book given its book ID.
@@ -132,7 +155,11 @@ def save_book():
 
     :return: Redirection
     """
-    book_id: str = request.form["book_id"]
+    book_id: Union[str, None] = request.form.get("book_id", None)
+
+    if book_id is None:
+        flash("Invalid request.")
+        return redirect(url_for("index"))
 
     book: Book = Book.query.filter_by(id=book_id).first_or_404()
 
@@ -146,15 +173,18 @@ def save_book():
 
 
 @bp.route("/book/<int:id>", methods=["GET"])
+@login_required
 def book(id: int):
     """
     See the details of a book.
 
     :param int id: The book ID
 
-    :returns: Render template
+    :return: Render template
     """
     book: Book = Book.query.filter_by(id=id).first_or_404()
+    saved_book: SavedBook = SavedBook.query.filter_by(
+        book_id=id, user_id=session.get("user_id")).first_or_404()
 
     bookname: str = book.bookname
     author: list = book.author.split(",")
@@ -163,33 +193,81 @@ def book(id: int):
         list, None] = book.description if book.description != None else None
     categories: Union[list, None] = book.categories.split(
         ",") if book.categories != None else None
+    average_rating: Union[int, None] = book.average_rating
+
+    my_rating: Union[int, None] = saved_book.rating
+    my_review: Union[str, None] = saved_book.review
 
     return render_template("books/book.html",
+                           book_id=id,
                            bookname=bookname,
                            author=author,
                            isbn=isbn,
                            description=description,
-                           categories=categories)
+                           categories=categories,
+                           average_rating=average_rating,
+                           my_rating=my_rating,
+                           my_review=my_review)
 
 
 @bp.route("/mybooks", methods=["GET"])
+@login_required
 def my_books():
     """
     Show all the books of a given user.
 
     :param: None
 
-    :returns: Render template
+    :return: Render template
     """
     user: User = User.query.filter_by(id=session.get("user_id")).first_or_404()
 
     saved_books: Union[list, None] = SavedBook.query.filter_by(
         user_id=user.id).all()
 
-    if saved_books is None:
-        return redirect(url_for("index"))
-
-    for i, saved_book in enumerate(saved_books):
-        saved_books[i] = Book.query.filter_by(id=saved_book.book_id).first()
+    if len(saved_books) == 0 or saved_books is None:
+        flash("No saved books found.")
+    else:
+        for i, saved_book in enumerate(saved_books):
+            saved_books[i] = Book.query.filter_by(
+                id=saved_book.book_id).first()
 
     return render_template("books/mybooks.html", saved_books=saved_books)
+
+
+@bp.route("/book/<int:id>/review", methods=["GET", "POST"])
+@login_required
+def review(id: int):
+    """
+    Review a book with a numeric rating and/or written review.
+
+    :param int id: The book ID
+
+    :return: Redirection
+    """
+    book: Book = Book.query.filter_by(id=id).first_or_404()
+
+    bookname: str = book.bookname
+
+    if request.method == "POST":
+        rating: Union[int, None] = request.form.get("rating", None)
+        review: Union[str, None] = request.form.get("review", None)
+
+        if rating is None or review is None:
+            flash("Malformed request.")
+        else:
+            saved_book: SavedBook = SavedBook.query.filter_by(
+                book_id=id, user_id=session.get("user_id")).first_or_404()
+
+            save_book.rating = rating
+            save_book.review = review
+
+            book.average_rating = ((book.average_rating * book.total_ratings) +
+                                   rating) / (book.total_ratings + 1)
+            book.total_ratings += 1
+
+            db.session.commit()
+
+            return redirect(url_for("books.book", id=id))
+
+    return render_template("books/review.html", bookname=bookname)

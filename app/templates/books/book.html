@@ -17,12 +17,16 @@
 {% endblock %}
 
 {% block content %}
-<div class="card text-white bg-dark">
+{{ super() }}
+<div class="card text-white bg-dark mb-3">
   <div class="card-header">
     <h3 class="font-italic mt-2">{{ bookname }}</h3>
   </div>
   <div class="card-body">
-    <h5 class="card-title">{{ author|join(', ') }}</h5>
+    <h5 class="card-title">By: {{ author|join(', ') }}</h5>
+    {% if average_rating %}
+    <span class="badge badge-warning">{{ average_rating }} / 5</span>
+    {% endif %}
     {% if description %}
     <p class="card-text">{{ description }}</p>
     {% endif %}
@@ -38,4 +42,18 @@
     </p>
   </div>
 </div>
+{% if my_rating and my_review%}
+<div class="card text-white bg-dark">
+  <div class="card-body">
+    <h5 class="card-title font-italic">{{ saved_book.rating }} / 5</h5>
+    <p class="card-text">{{ saved_book.review }}</p>
+    <a href="#" class="ml-auto card-link">Edit</a>
+  </div>
+</div>
+{% else %}
+<div class="d-flex flex-row">
+  <a href="{{ url_for('books.review', id=book_id) }}" class="ml-auto btn btn-outline-primary" role="button"
+    aria-pressed="true">Add My Review</a>
+</div>
+{% endif %}
 {% endblock %}
