@@ -49,7 +49,7 @@ def home():
 def browse():
     """
     Return the browse view for a logged in user.
-    Search for a book in the database.
+    Search for a book in the database or through Google Books API.
     Limit the results to only ten entries.
 
     :param None:
@@ -59,84 +59,90 @@ def browse():
     books: Union[list, None] = None
 
     if request.method == "POST":
+        books = []
+
         bookname: str = request.form["search_book"]
 
-        books: list = []
-        books.append(Book.query.filter_by(bookname=bookname).first())
+        books += Book.query.filter(Book.bookname.contains(
+            bookname.lower())).limit(10).all()
 
-        if books[0] is None:
-            books.pop(0)
-            tokens: Union[list, None] = bookname.split().sort(reverse=True)
+        if len(books) < 10:
+            fetched_books: Union[list, None] = None
 
-            for token in bookname.split():
-                books += Book.query.filter(
-                    Book.bookname.contains(token.lower())).all()
+            fetched_books = service.volumes().list(
+                q=f"intitle={bookname}").execute().get("items", None)
 
+            for i, book in enumerate(fetched_books):
+                book_title: Union[str, None] = book[
+                    "volumeInfo"]["title"] if book["volumeInfo"].get(
+                        "title", None) is not None else None
+
+                author: Union[str, None] = ",".join(
+                    book["volumeInfo"]["authors"]) if book["volumeInfo"].get(
+                        "authors", None) is not None else None
+
+                isbn: Union[str,
+                            None] = book["volumeInfo"]["industryIdentifiers"][
+                                0]["identifier"] if book["volumeInfo"].get(
+                                    "industryIdentifiers", None
+                                ) is not None and "ISBN" in book["volumeInfo"][
+                                    "industryIdentifiers"][0]["type"] else None
+
+                description: Union[str, None] = book["volumeInfo"].get(
+                    "description", None)
+
+                categories: Union[str, None] = ",".join(
+                    book["volumeInfo"]
+                    ["categories"]) if book["volumeInfo"].get(
+                        "categories", None) is not None else None
+
+                possible_book: Union[Book, None] = Book.query.filter_by(
+                    isbn=isbn).first() if isbn is not None else None
+
+                if possible_book is None and all(
+                        map(lambda x: x is not None,
+                            (book_title, author, isbn))):
+                    created_book: Book = Book(bookname=book_title,
+                                              author=author,
+                                              isbn=isbn,
+                                              description=description,
+                                              categories=categories)
+
+                    db.session.add(created_book)
+                    db.session.commit()
+
+                    fetched_books[i] = created_book
+                else:
+                    fetched_books[i] = possible_book
+
+            books += fetched_books
+            books = [book for book in books if book is not None]
+            books = list(set(books))
             books = books[:10]
 
     return render_template("books/browse.html", books=books)
 
 
-@bp.route("/lookup", methods=["GET", "POST"])
-def lookup_book():
+@bp.route("/save", methods=["POST"])
+def save_book():
     """
-    Lookup book(s) by a given title.
+    Save a book given its book ID.
 
-    :param None:
+    :param: None
 
-    :returns: Redirection or render template
+    :return: Redirection
     """
-    books: Union[list, None] = None
+    book_id: str = request.form["book_id"]
 
-    if request.method == "POST":
-        book_title: str = request.form["book_title"]
+    book: Book = Book.query.filter_by(id=book_id).first_or_404()
 
-        books = service.volumes().list(
-            q=f"intitle={book_title}").execute().get("items", None)
+    save_book: SavedBook = SavedBook(book_id=book_id,
+                                     user_id=session.get("user_id"))
 
-    return render_template("books/lookup.html", books=books)
+    db.session.add(save_book)
+    db.session.commit()
 
-
-@bp.route("/add", methods=["GET"])
-def add_book():
-    """
-    Add a book to the database
-
-    :param None:
-
-    :returns: Redirection
-    """
-    given_book: Union[dict, None] = json.loads(
-        request.args["book"]) if request.args["book"] != "" else None
-
-    if request is None:
-        return redirect(url_for("books.lookup_book"))
-    else:
-        description = given_book.get("volumeInfo",
-                                     None).get("description", None)
-        categories = ",".join(
-            given_book["volumeInfo"]["categories"]) if given_book.get(
-                "volumeInfo", None).get("categories",
-                                        None) is not None else None
-
-        book: Book = Book(bookname=given_book["volumeInfo"]["title"],
-                          author=",".join(given_book["volumeInfo"]["authors"]),
-                          isbn=given_book["volumeInfo"]["industryIdentifiers"]
-                          [0]["identifier"],
-                          description=description,
-                          categories=categories)
-        db.session.add(book)
-        db.session.commit()
-
-        user: User = User.query.filter_by(
-            id=session.get("user_id")).first_or_404()
-
-        saved_book: SavedBook = SavedBook(book_id=book.id, user_id=user.id)
-
-        db.session.add(saved_book)
-        db.session.commit()
-
-    return redirect(url_for("books.book", id=book.id))
+    return redirect(url_for("books.book", id=book_id))
 
 
 @bp.route("/book/<int:id>", methods=["GET"])

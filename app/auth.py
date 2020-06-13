@@ -134,8 +134,8 @@ def settings():
             db.session.commit()
             flash(f"Display name updated to {display_name}.")
 
-        if not all(
-                map(lambda x: x is None,
+        if all(
+                map(lambda x: x is not None,
                     (current_password, new_password, confirm_password))):
             if current_password is None:
                 flash("Missing current password.")
