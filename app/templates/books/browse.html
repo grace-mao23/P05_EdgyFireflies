@@ -15,44 +15,36 @@
 {% endblock style %}
 
 {% block content %}
-<h3>Welcome to the search!</h3>
+  <h3>Welcome to the search!</h3>
 
-<form method="POST">
-    {{ form.csrf_token }}
-    {{ form_field(form.search) }}
-    {{ form_field(form.submit) }}
-</form>
+  <form method="POST">
+      {{ form.csrf_token }}
+      {{ form_field(form.search) }}
+      {{ form_field(form.submit) }}
+  </form>
 
-<hr>
+  <hr>
 
-{% if results is not none %}
+  <ol>
+  {% for key, value in dict.items() %}
+      <li> <b> {{key}} </b> by <i> {{value}} </i> <br> </li>
+  {% endfor %}
+  </ol>
 
-<p>Search results for: {{ query }}</p>
+  {% if results is not none %}
 
-{% for card_list in results %}
+    {% for i in books %}
 
-<div class="row">
-    {% for card in card_list %}
+      {% for card_list in results %}
 
-    <div class="col">
-        {% if card is not none %}
-        card
-        {% endif %}
-
-    </div>
+      {% endfor %}
 
     {% endfor %}
 
-</div><br>
+  {% endif %}
 
-
-{% endfor %}
-
-{% if results == [] %}
-<br><br><br>
-<p class="text-center"><em>No cards found!</em></p>
-{% endif %}
-
-{% endif %}
-
+  {% if results == [] %}
+  <br><br><br>
+  <p class="text-center"><em>No cards found!</em></p>
+  {% endif %}
 {% endblock content %}

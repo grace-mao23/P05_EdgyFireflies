@@ -1,3 +1,9 @@
+tammyC -- 2020-06-13 14:27
+  - moved API & book search to proper location
+  - touched up search function with Google Books API instead of OpenLibrary
+  - implemented basic jinja for book search display 
+  - // will work on card style and implementing more of APIs components
+
 josephL -- 2020-06-10 15:02
   - finished basic search function
   - adjusted sql model relationships

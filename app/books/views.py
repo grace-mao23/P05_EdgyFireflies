@@ -67,11 +67,13 @@ def browse():
     form = SearchForm()
 
     full_results = None
+    dict = {}
 
     if form.validate_on_submit():
         #1st api
         data = '+'.join(form.search.data.split(' '))
-        url = "http://openlibrary.org/search.json?q=" + str(data)
+
+        url = "https://www.googleapis.com/books/v1/volumes?q=" + str(data)
         hdr = {
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -81,31 +83,12 @@ def browse():
             'Connection': 'keep-alive'
         }
         req = urllib.Request(url, headers=hdr)
-        isbn = json.loads(urllib.urlopen(req).read())['docs'][0]['isbn'][0]
-        #2nd api
-        url_2 = "https://openlibrary.org/api/books?bibkeys=ISBN:" + str(isbn) + "&jscmd=data&format=json"
-        req = urllib.Request(url_2, headers=hdr)
-        data = json.loads(urllib.urlopen(req).read())["ISBN:"+str(isbn)]
-        if "cover" in data.keys():
-            data = data["cover"]["medium"]
-            print(data)
+        isbn = json.loads(urllib.urlopen(req).read())["items"]
 
-        results = ["f"]
+        for i in range(len(isbn)):
+            dict[isbn[i]['volumeInfo']['title']] = isbn[i]['volumeInfo']['authors'][0]
 
-        # cut results off
-        results = results[:SEARCH_LIMIT]
-
-        # pad results
-        while len(results) % PER_ROW != 0:
-            results.append(None)
-
-        full_results = []
-
-        print(full_results)
-
-        for i in range(len(results) // PER_ROW):
-            full_results.append(results[i * PER_ROW:(i + 1) * PER_ROW])
-
+        print(dict)
     if request.method == "POST":
         pass
 
@@ -113,7 +96,8 @@ def browse():
                            form=form,
                            query=form.search.data,
                            limit=SEARCH_LIMIT,
-                           results=full_results)
+                           results=full_results,
+                           dict = dict)
 
 
 
