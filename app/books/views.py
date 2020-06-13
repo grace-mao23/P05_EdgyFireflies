@@ -68,6 +68,7 @@ def browse():
 
     full_results = None
     dict = {}
+    pics = []
 
     if form.validate_on_submit():
         #1st api
@@ -87,8 +88,10 @@ def browse():
 
         for i in range(len(isbn)):
             dict[isbn[i]['volumeInfo']['title']] = isbn[i]['volumeInfo']['authors'][0]
+            pics.append(isbn[i]['volumeInfo']['imageLinks']['thumbnail'])
 
-        print(dict)
+        #print(dict) ['imageLinks']['thumbnail']
+
     if request.method == "POST":
         pass
 
@@ -97,7 +100,8 @@ def browse():
                            query=form.search.data,
                            limit=SEARCH_LIMIT,
                            results=full_results,
-                           dict = dict)
+                           dict = dict,
+                           pics = pics)
 
 
 
