@@ -18,9 +18,12 @@
 
 {% block content %}
 {{ super() }}
-<div class="card my-3 text-black bg-white shadow rounded">
+<div class="card my-3 text-black bg-white shadow-sm rounded">
   <div class="card-body">
-    <h5 class="card-title border-bottom pb-3">My Profile</h5>
+    <h5 class="card-title d-flex flex-row justify-content-between border-bottom mb-3 py-2">
+      My Profile
+      <a href="{{ url_for('friends.edit') }}" role="button" class="btn btn-outline-dark btn-sm">Edit</a>
+    </h5>
     <div class="d-flex flex-row">
       <div class="mr-2">
         <svg class="bi bi-person-square" width="10em" height="10em" viewBox="0 0 16 16" fill="currentColor"
@@ -35,26 +38,35 @@
           <p class="font-weight-bold">Username: <span class="align-middle badge badge-dark"> {{ username }} </span></p>
           <p class="font-weight-bold">Display Name: <span class="align-middle badge badge-dark"> {{ display_name }}
             </span></p>
-          <p class="font-weight-bold">Bio: BIO</p>
+          <p class="font-weight-bold">Bio: {{ bio }}</p>
         </div>
       </div>
     </div>
   </div>
 </div>
-<div class="card my-3 text-white bg-dark shadow rounded">
+<div class="card my-3 text-dark bg-white shadow-sm rounded">
   <div class="card-body">
     <h5 class="card-title border-bottom pb-3">Recent Messages</h5>
   </div>
 </div>
 <div class="card-deck">
-  <div class="card text-white bg-dark shadow-sm rounded">
+  <div class="card text-dark bg-white shadow-sm rounded">
     <div class="card-body">
       <h5 class="card-title border-bottom pb-3">Friends</h5>
     </div>
   </div>
-  <div class="card text-white bg-dark shadow-sm rounded">
+  <div class="card text-dark bg-white shadow-sm rounded">
     <div class="card-body">
       <h5 class="card-title border-bottom pb-3">Reading List</h5>
+      {% if saved_books %}
+      <ul class="list-group">
+        {% for saved_book in saved_books %}
+        {% if saved_book.to_be_read %}
+        <li class="list-group-item">{{ books[loop.index0].bookname }}</li>
+        {% endif %}
+        {% endfor %}
+      </ul>
+      {% endif %}
     </div>
   </div>
 </div>

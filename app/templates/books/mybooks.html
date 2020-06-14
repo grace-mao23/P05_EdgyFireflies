@@ -18,14 +18,24 @@
 
 {% block content %}
 {{ super() }}
-{% if saved_books %}
+{% if books %}
 <div class="bg-dark text-white rounded shadow-sm px-3 mb-3">
   <h3 class="py-3">My Saved Books</h3>
 </div>
 <ul class="list-group">
-  {% for book in saved_books %}
-  <a href="{{ url_for('books.book', id=book.id) }}"
-    class="list-group-item list-group-item-action">{{ book.bookname }}</a>
+  {% for book in books %}
+  <li class="list-group-item d-flex flex-row justify-content-between">
+    <h5>{{ book.bookname }}</h5>
+    <div class="btn-group btn-group-sm" role="group" aria-label="book-actions">
+      <a href="{{ url_for('books.book', id=book.id) }}" class="btn btn-secondary">View</a>
+      {% if saved_books[loop.index0].to_be_read %}
+      <a href="{{ url_for('books.remove_from_reading_list', id=book.id) }}" class="btn btn-secondary">Remove from
+        Reading List</a>
+      {% else %}
+      <a href="{{ url_for('books.add_to_reading_list', id=book.id) }}" class="btn btn-secondary">Add to Reading List</a>
+      {% endif %}
+    </div>
+  </li>
   {% endfor %}
 </ul>
 {% endif %}

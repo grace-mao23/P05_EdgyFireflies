@@ -84,8 +84,8 @@ def create_app(config: dict = None) -> Flask:
     # Define error handling
 
     @app.errorhandler(404)
-    def handle_404_not_found():
-        flash("An error has occurred. Please try again.")
+    def handle_404_not_found(error):
+        flash(f"{error}")
         return redirect(url_for("index"))
 
     return app

@@ -19,6 +19,7 @@ class User(db.Model):
                                         unique=False,
                                         nullable=False)
     _password: db.Column = db.Column("password", db.String, nullable=False)
+    bio: db.Column = db.Column(db.String, nullable=True)
 
     @hybrid_property
     def password(self: object) -> str:
@@ -73,8 +74,11 @@ class Book(db.Model):
     isbn: db.Column = db.Column(db.String, unique=True, nullable=False)
     description: db.Column = db.Column(db.String, nullable=True)
     categories: db.Column = db.Column(db.String, nullable=True)
-    average_rating: db.Column = db.Column(db.Integer, nullable=True)
-    total_ratings: db.Column = db.Column(db.Integer, nullable=True)
+    thumbnail: db.Column = db.Column(db.String, nullable=True)
+    average_rating: db.Column = db.Column(db.Integer,
+                                          default=0,
+                                          nullable=False)
+    total_ratings: db.Column = db.Column(db.Integer, default=0, nullable=False)
 
 
 class SavedBook(db.Model):
@@ -96,3 +100,6 @@ class SavedBook(db.Model):
                                    nullable=False)
     rating: db.Column = db.Column(db.Integer, nullable=True)
     review: db.Column = db.Column(db.String, nullable=True)
+    to_be_read: db.Column = db.Column(db.Boolean,
+                                      default=False,
+                                      nullable=False)

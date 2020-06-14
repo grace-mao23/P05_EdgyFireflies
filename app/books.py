@@ -81,7 +81,7 @@ def browse():
                     "volumeInfo"]["title"] if book["volumeInfo"].get(
                         "title", None) is not None else None
 
-                author: Union[str, None] = ",".join(
+                author: Union[str, None] = ", ".join(
                     book["volumeInfo"]["authors"]) if book["volumeInfo"].get(
                         "authors", None) is not None else None
 
@@ -99,6 +99,12 @@ def browse():
                     book["volumeInfo"]
                     ["categories"]) if book["volumeInfo"].get(
                         "categories", None) is not None else None
+
+                thumbnail: Union[str, None] = book["volumeInfo"][
+                    "imageLinks"]["thumbnail"] if book["volumeInfo"].get(
+                        "imageLinks",
+                        None) and book["volumeInfo"]["imageLinks"].get(
+                            "thumbnail") is not None else None
 
                 if book_title is not None and db.session.query(
                         Book.query.filter_by(
@@ -125,7 +131,8 @@ def browse():
                                               author=author,
                                               isbn=isbn,
                                               description=description,
-                                              categories=categories)
+                                              categories=categories,
+                                              thumbnail=thumbnail)
 
                     db.session.add(created_book)
                     db.session.commit()
@@ -137,9 +144,7 @@ def browse():
                 book for book in books
                 if book is not None and not isinstance(book, dict)
             ]
-            print(books)
             books = list(set(books))
-            print(books)
             books = books[:10]
 
     return render_template("books/browse.html", books=books)
@@ -187,12 +192,12 @@ def book(id: int):
         book_id=id, user_id=session.get("user_id")).first_or_404()
 
     bookname: str = book.bookname
-    author: list = book.author.split(",")
+    author: list = book.author.split(", ")
     isbn: str = book.isbn
-    description: Union[
-        list, None] = book.description if book.description != None else None
+    description: Union[list, None] = book.description
     categories: Union[list, None] = book.categories.split(
         ",") if book.categories != None else None
+    thumbnail: Union[str, None] = book.thumbnail
     average_rating: Union[int, None] = book.average_rating
 
     my_rating: Union[int, None] = saved_book.rating
@@ -205,6 +210,7 @@ def book(id: int):
                            isbn=isbn,
                            description=description,
                            categories=categories,
+                           thumbnail=thumbnail,
                            average_rating=average_rating,
                            my_rating=my_rating,
                            my_review=my_review)
@@ -225,14 +231,17 @@ def my_books():
     saved_books: Union[list, None] = SavedBook.query.filter_by(
         user_id=user.id).all()
 
+    books: Union[list, None] = []
+
     if len(saved_books) == 0 or saved_books is None:
         flash("No saved books found.")
     else:
-        for i, saved_book in enumerate(saved_books):
-            saved_books[i] = Book.query.filter_by(
-                id=saved_book.book_id).first()
+        for saved_book in saved_books:
+            books.append(Book.query.filter_by(id=saved_book.book_id).first())
 
-    return render_template("books/mybooks.html", saved_books=saved_books)
+    return render_template("books/mybooks.html",
+                           books=books,
+                           saved_books=saved_books)
 
 
 @bp.route("/book/<int:id>/review", methods=["GET", "POST"])
@@ -247,20 +256,25 @@ def review(id: int):
     """
     book: Book = Book.query.filter_by(id=id).first_or_404()
 
+    saved_book: SavedBook = SavedBook.query.filter_by(
+        book_id=id, user_id=session.get("user_id")).first_or_404()
+
     bookname: str = book.bookname
 
+    saved_rating: Union[int, None] = saved_book.rating
+    saved_review: Union[str, None] = saved_book.review
+
     if request.method == "POST":
-        rating: Union[int, None] = request.form.get("rating", None)
+        rating: Union[int, str, None] = request.form.get("rating", None)
         review: Union[str, None] = request.form.get("review", None)
 
         if rating is None or review is None:
             flash("Malformed request.")
         else:
-            saved_book: SavedBook = SavedBook.query.filter_by(
-                book_id=id, user_id=session.get("user_id")).first_or_404()
+            rating = int(rating)
 
-            save_book.rating = rating
-            save_book.review = review
+            saved_book.rating = rating
+            saved_book.review = review
 
             book.average_rating = ((book.average_rating * book.total_ratings) +
                                    rating) / (book.total_ratings + 1)
@@ -270,4 +284,47 @@ def review(id: int):
 
             return redirect(url_for("books.book", id=id))
 
-    return render_template("books/review.html", bookname=bookname)
+    return render_template("books/review.html",
+                           bookname=bookname,
+                           saved_rating=saved_rating,
+                           saved_review=saved_review)
+
+
+@bp.route("/book/<int:id>/add/reading", methods=["GET"])
+@login_required
+def add_to_reading_list(id: int):
+    """
+    Add a book to the user's reading list.
+
+    :param int id: The book ID
+
+    :return: Redirection
+    """
+    saved_book: SavedBook = SavedBook.query.filter_by(
+        book_id=id, user_id=session.get("user_id")).first_or_404()
+
+    saved_book.to_be_read = True
+
+    db.session.commit()
+
+    return redirect(url_for("books.my_books"))
+
+
+@bp.route("/book/<int:id>/remove/reading", methods=["GET"])
+@login_required
+def remove_from_reading_list(id: int):
+    """
+    Remove a book from the user's reading list.
+
+    :param int id: The book ID
+
+    :return: Redirection
+    """
+    saved_book: SavedBook = SavedBook.query.filter_by(
+        book_id=id, user_id=session.get("user_id")).first_or_404()
+
+    saved_book.to_be_read = False
+
+    db.session.commit()
+
+    return redirect(url_for("books.my_books"))
