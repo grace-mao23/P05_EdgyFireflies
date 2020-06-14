@@ -1,6 +1,8 @@
 from flask import (Blueprint, render_template, request, session, redirect,
                    url_for)
 
+from app.books.models import Author, Book
+
 from app import db
 from app.auth.views import login_required
 from app.forms import SearchForm
@@ -71,7 +73,7 @@ def browse():
     pics = []
 
     if form.validate_on_submit():
-        #1st api
+        #search through Google API
         data = '+'.join(form.search.data.split(' '))
 
         url = "https://www.googleapis.com/books/v1/volumes?q=" + str(data)
@@ -84,13 +86,46 @@ def browse():
             'Connection': 'keep-alive'
         }
         req = urllib.Request(url, headers=hdr)
-        isbn = json.loads(urllib.urlopen(req).read())["items"]
+        books = json.loads(urllib.urlopen(req).read())["items"]
 
-        for i in range(len(isbn)):
-            dict[isbn[i]['volumeInfo']['title']] = isbn[i]['volumeInfo']['authors'][0]
-            pics.append(isbn[i]['volumeInfo']['imageLinks']['thumbnail'])
+        #loop through queried books
+        for i in range(len(books)):
+            book = Book.query.filter_by(isbn = isbn).first()
+            #if book doesn't exist in the database yet, collect data from APIs
+            if book == None:
+                #collecting title and author from Google API
+                isbn = books[i]['volumeInfo']['industryIdentifiers'][0]['identifier']
+                title = books[i]['volumeInfo']['title']
+                author_name = books[i]['volumeInfo']['authors'][0]
+                cover_url = books[i]['volumeInfo']['imageLinks']['thumbnail']
+                dict[title] = author_name
+                pics.append(cover_url)
+                #collecting tags from OpenLibary API
+                url_2 = "https://openlibrary.org/api/books?bibkeys=ISBN:" + str(isbn) + "&jscmd=data&format=json"
+                req = urllib.Request(url_2, headers=hdr)
+                tags = json.loads(urllib.urlopen(req).read())['ISBN:'+str(isbn)]['details']['subjects']
+                #create book
+                new_book = Book(title = title, isbn = isbn, cover_url = cover_url, tags = tags)
+                #search for author in database
+                author = Author.query.filter_by(author_name = books[i]['volumeInfo']['authors'][0]).first()
+                if author == None:
+                    new_author = Author(author_name)
+                    new_author.books.append(new_book)
+                    db.session.add(new_author)
+                else:
+                    author.books.append(new_book)
+                    db.session.add(author)
+                #commit new book
+                db.session.add(new_book)
+                db.session.commit()
+            #if it does exist, collect data from database
+            else:
+                dict[books.title] = books.author_name
+                pics.append(books.cover_url)
 
+        print(dict)
         #print(dict) ['imageLinks']['thumbnail']
+        url = "http://openlibrary.org/search.json?q=" + str(form.search.data)
 
     if request.method == "POST":
         pass

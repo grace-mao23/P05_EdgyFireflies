@@ -11,7 +11,10 @@ class Author(db.Model):
     """
     author_id = db.Column(db.Integer, primary_key=True)
     author_name = db.Column(db.String, unique=True, nullable=False)
+    books = db.relationship('Book', backref='Author')
 
+    def __init__(self, author_name):
+        self.author_name = author_name
 
 class Book(db.Model):
     """Defines the Book class.
@@ -27,12 +30,17 @@ class Book(db.Model):
     """
     __table_args__ = {"extend_existing": True}
     book_id = db.Column(db.Integer, primary_key=True)
-    book_name = db.Column(db.String, unique=True, nullable=False)
     author_id = db.Column(db.ForeignKey(Author.author_id), nullable=False)
-    isbn = db.Column(db.String, nullable=True)
-    book_genres = db.Column(db.String, nullable=True)
-    year = db.Column(db.DateTime, nullable=True)
+    title = db.Column(db.String, unique=True, nullable=False)
+    isbn = db.Column(db.String, nullable=False)
+    cover_url = db.Column(db.String, nullable=True)
     tags = db.Column(db.String, nullable=True)
+
+    def __init__(self, title, isbn, cover_url, tags):
+        self.title = title
+        self.isbn = isbn
+        self.cover_url = cover_url
+        self.tags = tags
 
 
 # class Review(db.Model):

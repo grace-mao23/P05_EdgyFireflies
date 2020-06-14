@@ -69,7 +69,10 @@ def create_app(config=None):
             db.create_all()
     except OSError:
         pass
-
+        
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
     # ---END---
     # Define middlewares
     # ---START---
