@@ -157,6 +157,8 @@ def settings():
     Updatable:
       Email
       Password
+      Bio
+      Genre
 
     Args:
       None
