@@ -17,33 +17,6 @@
 {% endblock %}
 
 {% block content %}
-<<<<<<< HEAD
-  <h3>Welcome to the search!</h3>
-
-  <form method="POST">
-      {{ form.csrf_token }}
-      {{ form_field(form.search) }}
-      {{ form_field(form.submit) }}
-  </form>
-
-  <hr>
-
-  <ol>
-  {% for key, value in dict.items() %}
-      <li> <b> {{key}} </b> by <i> {{value}} </i> <br> </li>
-  {% endfor %}
-  </ol>
-
-  {% for i in pics %}
-    <img src={{i}}></img>
-  {% endfor %}
-
-  {% if results == [] %}
-  <br><br><br>
-  <p class="text-center"><em>No cards found!</em></p>
-  {% endif %}
-{% endblock content %}
-=======
 {{ super() }}
 <form class="container" method="post">
   <div class="form-group">
@@ -97,4 +70,3 @@
 </div>
 {% endif %}
 {% endblock %}
->>>>>>> bf4b7389ed78361e4f29e19f7800eb4e21a25ce4

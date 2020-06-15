@@ -24,7 +24,7 @@ service: Resource = build("books", "v1", developerKey=api_key)
 def create_app(config: dict = None) -> Flask:
     """
     Create and configure a Flask app.
-    
+
     :param dict config: The test configuration object
 
     :return: A Flask application instance.
@@ -66,15 +66,7 @@ def create_app(config: dict = None) -> Flask:
             db.create_all()
     except OSError:
         pass
-<<<<<<< HEAD
-        
-    with app.app_context():
-        db.drop_all()
-        db.create_all()
-    # ---END---
-=======
 
->>>>>>> bf4b7389ed78361e4f29e19f7800eb4e21a25ce4
     # Define middlewares
 
     @app.teardown_request
