@@ -156,14 +156,6 @@ def connect() -> None:
         other_user: User = User.query.filter_by(
             id=other_user_id).first_or_404()
 
-        print(
-            MessageSession.query.filter_by(user_a_id=user.id,
-                                           user_b_id=other_user.id).first())
-
-        print(
-            MessageSession.query.filter_by(user_a_id=other_user.id,
-                                           user_b_id=user.id).first())
-
         if not db.session.query(
                 MessageSession.query.filter_by(user_a_id=user.id,
                                                user_b_id=other_user.id).
@@ -176,11 +168,26 @@ def connect() -> None:
 
             db.session.add(message_session)
             db.session.commit()
+        else:
+            message_session_a: Union[MessageSession,
+                                     None] = MessageSession.query.filter_by(
+                                         user_a_id=user.id,
+                                         user_b_id=other_user.id).first()
+            message_session_b: Union[MessageSession,
+                                     None] = MessageSession.query.filter_by(
+                                         user_a_id=other_user.id,
+                                         user_b_id=user.id).first()
+
+            if message_session_a is None and message_session_b is not None:
+                message_session = message_session_b
+            elif message_session_a is not None and message_session_b is None:
+                message_session = message_session_a
 
     display_name: str = user.display_name
 
     return render_template("match/connect.html",
                            display_name=display_name,
+                           room=message_session.room,
                            other_user_id=other_user_id)
 
 
@@ -196,11 +203,21 @@ def handle_join(payload: dict):
     user_id: int = session.get("user_id")
     other_user_id: int = int(payload["other_user_id"])
 
-    message_session: Union[MessageSession, None] = MessageSession.query.filter(
-        (MessageSession.user_a_id == user_id
-         and MessageSession.user_b_id == other_user_id)
-        or (MessageSession.user_a_id == other_user_id
-            and MessageSession.user_b_id == user_id)).first()
+    message_session: Union[MessageSession, None] = None
+
+    message_session_a: Union[MessageSession,
+                             None] = MessageSession.query.filter_by(
+                                 user_a_id=user_id,
+                                 user_b_id=other_user_id).first()
+    message_session_b: Union[MessageSession,
+                             None] = MessageSession.query.filter_by(
+                                 user_a_id=other_user_id,
+                                 user_b_id=user_id).first()
+
+    if message_session_a is None and message_session_b is not None:
+        message_session = message_session_b
+    elif message_session_a is not None and message_session_b is None:
+        message_session = message_session_a
 
     if message_session is None:
         flash("Socket connection failed.")
@@ -228,11 +245,21 @@ def handle_chat_message(payload: dict):
     user_id: int = session.get("user_id")
     other_user_id: int = int(payload["other_user_id"])
 
-    message_session: Union[MessageSession, None] = MessageSession.query.filter(
-        (MessageSession.user_a_id == user_id
-         and MessageSession.user_b_id == other_user_id)
-        or (MessageSession.user_a_id == other_user_id
-            and MessageSession.user_b_id == user_id)).first()
+    message_session: Union[MessageSession, None] = None
+
+    message_session_a: Union[MessageSession,
+                             None] = MessageSession.query.filter_by(
+                                 user_a_id=user_id,
+                                 user_b_id=other_user_id).first()
+    message_session_b: Union[MessageSession,
+                             None] = MessageSession.query.filter_by(
+                                 user_a_id=other_user_id,
+                                 user_b_id=user_id).first()
+
+    if message_session_a is None and message_session_b is not None:
+        message_session = message_session_b
+    elif message_session_a is not None and message_session_b is None:
+        message_session = message_session_a
 
     if message_session is None:
         flash("Socket connection failed.")
@@ -257,11 +284,21 @@ def handle_leave(payload: dict):
     user_id: int = session.get("user_id")
     other_user_id: int = int(payload["other_user_id"])
 
-    message_session: Union[MessageSession, None] = MessageSession.query.filter(
-        (MessageSession.user_a_id == user_id
-         and MessageSession.user_b_id == other_user_id)
-        or (MessageSession.user_a_id == other_user_id
-            and MessageSession.user_b_id == user_id)).first()
+    message_session: Union[MessageSession, None] = None
+
+    message_session_a: Union[MessageSession,
+                             None] = MessageSession.query.filter_by(
+                                 user_a_id=user_id,
+                                 user_b_id=other_user_id).first()
+    message_session_b: Union[MessageSession,
+                             None] = MessageSession.query.filter_by(
+                                 user_a_id=other_user_id,
+                                 user_b_id=user_id).first()
+
+    if message_session_a is None and message_session_b is not None:
+        message_session = message_session_b
+    elif message_session_a is not None and message_session_b is None:
+        message_session = message_session_a
 
     if message_session is None:
         flash("Socket connection failed.")
