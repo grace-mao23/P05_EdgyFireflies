@@ -76,8 +76,8 @@ def browse():
         if len(books) < 10:
             fetched_books: Union[list, None] = None
 
-            fetched_books = service.volumes().list(
-                q=f"intitle={bookname}").execute().get("items", None)
+            fetched_books = service.volumes().list(q=bookname).execute().get(
+                "items", None)
 
             if fetched_books is None:
                 flash("No books found.")
@@ -118,13 +118,6 @@ def browse():
                                 bookname=book_title).exists()).scalar():
                         fetched_books[i] = Book.query.filter_by(
                             bookname=book_title).first_or_404()
-                        continue
-
-                    if author is not None and db.session.query(
-                            Book.query.filter_by(
-                                author=author).exists()).scalar():
-                        fetched_books[i] = Book.query.filter_by(
-                            author=author).first_or_404()
                         continue
 
                     if isbn is not None and db.session.query(
