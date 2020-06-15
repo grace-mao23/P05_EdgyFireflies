@@ -1,5 +1,12 @@
+josephL -- 2020-06-15 14:40
+  - reviewed merged code, found bugs
+  - fixed bio updating redirect bug
+
 tammyC -- 2020-06-14 11:01
   - begin work on profile setting & customization by individual user
+
+josephL -- 2020-06-14 9:02
+  - finished up search and adding to the database on search
 
 tammyC -- 2020-06-13 15:01
   - added image onto page
