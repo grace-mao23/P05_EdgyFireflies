@@ -2,7 +2,13 @@
 
 Read and Chill: Read Your Way to Real Romance
 
+Main:
+
 ![CI Status](https://github.com/grace-mao23/P05_EdgyFireflies/workflows/CI/badge.svg)
+
+Alternate:
+
+![CI Status](https://github.com/juntaolei/P05_EdgyFireflies/workflows/CI/badge.svg)
 
 ## Roster
 
