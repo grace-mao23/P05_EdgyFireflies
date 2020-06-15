@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Read and Chill | Potential Matches{% endblock %}
+
+{% block navigation %}
+<ul class="navbar-nav ml-auto">
+  <li class="nav-item">
+    <a class="nav-link text-muted" href="{{ url_for('books.home') }}">Home</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link text-muted" href="{{ url_for('auth.settings') }}">Settings</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link text-muted" href="{{ url_for('auth.logout') }}">Sign out</a>
+  </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+{{ super() }}
+<div class="bg-dark text-white rounded shadow-sm px-3 mb-3">
+  <h3 class="py-3">Potential Matches</h3>
+</div>
+{% if elo is not none and potential_friends is not none %}
+<ul class="list-group">
+  {% for score in elo %}
+  <li class="list-group-item d-flex flex-row justify-content-between">
+    <form action="{{ url_for('match.connect') }}" method="POST">
+      <h5>{{ potential_friends[loop.index0].display_name }}</h5>
+      <input type="hidden" name="other_user_id" id="other_user_id" value="{{ potential_friends[loop.index0].id }}" />
+      <div class="btn-group btn-group-sm" role="group" aria-label="book-actions">
+        <a href="{{ url_for('friends.profile', id=potential_friends[loop.index0].id) }}" class="btn btn-secondary">View
+          Profile</a>
+        <button type="submit" class="btn btn-secondary">Connect</button>
+      </div>
+    </form>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

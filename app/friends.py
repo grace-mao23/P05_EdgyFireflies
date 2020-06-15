@@ -1,4 +1,7 @@
+import functools
+
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+from flask_socketio import disconnect
 from typing import Union
 
 from app import db
@@ -8,17 +11,17 @@ from .models import Book, SavedBook, User
 bp: Blueprint = Blueprint("friends", __name__, url_prefix="/friends")
 
 
-@bp.route("/profile", methods=["GET"])
+@bp.route("/profile/<int:id>", methods=["GET"])
 @login_required
-def profile():
+def profile(id: int):
     """
-    Return the profile view of a logged in user.
+    View a user's profile.
 
-    :param: None
+    :param int id: The user ID
     
     :return: Render template
     """
-    user: User = User.query.filter_by(id=session.get("user_id")).first_or_404()
+    user: User = User.query.filter_by(id=id).first_or_404()
 
     username: str = user.username
     display_name: str = user.display_name
@@ -29,18 +32,19 @@ def profile():
 
     books: Union[list, None] = []
 
-    if len(saved_books) == 0 or saved_books is None:
-        flash("No saved books found.")
-    else:
+    if len(saved_books) != 0 or saved_books is not None:
         for saved_book in saved_books:
             books.append(Book.query.filter_by(id=saved_book.book_id).first())
+
+    is_logged_in_user: bool = user.id == session.get("user_id")
 
     return render_template("friends/profile.html",
                            username=username,
                            display_name=display_name,
                            bio=bio,
                            saved_books=saved_books,
-                           books=books)
+                           books=books,
+                           is_logged_in_user=is_logged_in_user)
 
 
 @bp.route("/", methods=["GET", "POST"])

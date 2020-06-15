@@ -28,7 +28,7 @@ class User(db.Model):
 
         :param object self: The User class
         
-        :returns: The password of type str
+        :return: The password of type str
         """
         return self._password
 
@@ -40,7 +40,7 @@ class User(db.Model):
         :param object self: The User class
         :param str given_password: The given password
 
-        :returns: None
+        :return: None
         """
         self._password = generate_password_hash(given_password)
 
@@ -51,7 +51,7 @@ class User(db.Model):
         :param object self: The User class
         :param str given_password: The given password
 
-        :returns: True or False on if the given password is valid
+        :return: True or False on if the given password is valid
         """
         return check_password_hash(self.password, given_password)
 
@@ -75,10 +75,8 @@ class Book(db.Model):
     description: db.Column = db.Column(db.String, nullable=True)
     categories: db.Column = db.Column(db.String, nullable=True)
     thumbnail: db.Column = db.Column(db.String, nullable=True)
-    average_rating: db.Column = db.Column(db.Integer,
-                                          default=0,
-                                          nullable=False)
-    total_ratings: db.Column = db.Column(db.Integer, default=0, nullable=False)
+    average_rating: db.Column = db.Column(db.Float, default=0, nullable=False)
+    total_ratings: db.Column = db.Column(db.Float, default=0, nullable=False)
 
 
 class SavedBook(db.Model):
@@ -103,3 +101,24 @@ class SavedBook(db.Model):
     to_be_read: db.Column = db.Column(db.Boolean,
                                       default=False,
                                       nullable=False)
+
+
+class MessageSession(db.Model):
+    """
+    Define the message session class.
+
+    :attribute Column id: The session ID
+    :attribute Column user_a_id: The user ID
+    :attribute Column user_b_id: The user ID
+    :attribute Column room: The room name
+    """
+    id: db.Column = db.Column(db.Integer, primary_key=True)
+    user_a_id: db.Column = db.Column(db.Integer,
+                                     db.ForeignKey("user.id"),
+                                     unique=True,
+                                     nullable=False)
+    user_b_id: db.Column = db.Column(db.Integer,
+                                     db.ForeignKey("user.id"),
+                                     unique=True,
+                                     nullable=False)
+    room: db.Column = db.Column(db.String, unique=True, nullable=False)

@@ -39,9 +39,12 @@ def home():
     """
     user: User = User.query.filter_by(id=session.get("user_id")).first_or_404()
 
+    user_id: int = user.id
     display_name: str = user.display_name
 
-    return render_template("books/home.html", display_name=display_name)
+    return render_template("books/home.html",
+                           user_id=user_id,
+                           display_name=display_name)
 
 
 @bp.route("/browse", methods=["GET", "POST"])
@@ -76,76 +79,83 @@ def browse():
             fetched_books = service.volumes().list(
                 q=f"intitle={bookname}").execute().get("items", None)
 
-            for i, book in enumerate(fetched_books):
-                book_title: Union[str, None] = book[
-                    "volumeInfo"]["title"] if book["volumeInfo"].get(
-                        "title", None) is not None else None
+            if fetched_books is None:
+                flash("No books found.")
+            else:
+                for i, book in enumerate(fetched_books):
+                    book_title: Union[str, None] = book[
+                        "volumeInfo"]["title"] if book["volumeInfo"].get(
+                            "title", None) is not None else None
 
-                author: Union[str, None] = ", ".join(
-                    book["volumeInfo"]["authors"]) if book["volumeInfo"].get(
-                        "authors", None) is not None else None
+                    author: Union[str, None] = ", ".join(
+                        book["volumeInfo"]
+                        ["authors"]) if book["volumeInfo"].get(
+                            "authors", None) is not None else None
 
-                isbn: Union[str,
-                            None] = book["volumeInfo"]["industryIdentifiers"][
-                                0]["identifier"] if book["volumeInfo"].get(
-                                    "industryIdentifiers", None
-                                ) is not None and "ISBN" in book["volumeInfo"][
-                                    "industryIdentifiers"][0]["type"] else None
+                    isbn: Union[
+                        str, None] = book["volumeInfo"]["industryIdentifiers"][
+                            0]["identifier"] if book["volumeInfo"].get(
+                                "industryIdentifiers", None
+                            ) is not None and "ISBN" in book["volumeInfo"][
+                                "industryIdentifiers"][0]["type"] else None
 
-                description: Union[str, None] = book["volumeInfo"].get(
-                    "description", None)
+                    description: Union[str, None] = book["volumeInfo"].get(
+                        "description", None)
 
-                categories: Union[str, None] = ",".join(
-                    book["volumeInfo"]
-                    ["categories"]) if book["volumeInfo"].get(
-                        "categories", None) is not None else None
+                    categories: Union[str, None] = ",".join(
+                        book["volumeInfo"]
+                        ["categories"]) if book["volumeInfo"].get(
+                            "categories", None) is not None else None
 
-                thumbnail: Union[str, None] = book["volumeInfo"][
-                    "imageLinks"]["thumbnail"] if book["volumeInfo"].get(
-                        "imageLinks",
-                        None) and book["volumeInfo"]["imageLinks"].get(
-                            "thumbnail") is not None else None
+                    thumbnail: Union[str, None] = book["volumeInfo"][
+                        "imageLinks"]["thumbnail"] if book["volumeInfo"].get(
+                            "imageLinks",
+                            None) and book["volumeInfo"]["imageLinks"].get(
+                                "thumbnail") is not None else None
 
-                if book_title is not None and db.session.query(
-                        Book.query.filter_by(
-                            bookname=book_title).exists()).scalar():
-                    fetched_books[i] = Book.query.filter_by(
-                        bookname=book_title).first_or_404()
-                    continue
+                    if book_title is not None and db.session.query(
+                            Book.query.filter_by(
+                                bookname=book_title).exists()).scalar():
+                        fetched_books[i] = Book.query.filter_by(
+                            bookname=book_title).first_or_404()
+                        continue
 
-                if author is not None and db.session.query(
-                        Book.query.filter_by(author=author).exists()).scalar():
-                    fetched_books[i] = Book.query.filter_by(
-                        author=author).first_or_404()
-                    continue
+                    if author is not None and db.session.query(
+                            Book.query.filter_by(
+                                author=author).exists()).scalar():
+                        fetched_books[i] = Book.query.filter_by(
+                            author=author).first_or_404()
+                        continue
 
-                if isbn is not None and db.session.query(
-                        Book.query.filter_by(bookname=isbn).exists()).scalar():
-                    fetched_books[i] = Book.query.filter_by(
-                        isbn=isbn).first_or_404()
-                    continue
+                    if isbn is not None and db.session.query(
+                            Book.query.filter_by(
+                                bookname=isbn).exists()).scalar():
+                        fetched_books[i] = Book.query.filter_by(
+                            isbn=isbn).first_or_404()
+                        continue
 
-                if all(map(lambda x: x is not None,
-                           (book_title, author, isbn))):
-                    created_book: Book = Book(bookname=book_title,
-                                              author=author,
-                                              isbn=isbn,
-                                              description=description,
-                                              categories=categories,
-                                              thumbnail=thumbnail)
+                    if all(
+                            map(lambda x: x is not None,
+                                (book_title, author, isbn))):
+                        created_book: Book = Book(bookname=book_title,
+                                                  author=author,
+                                                  isbn=isbn,
+                                                  description=description,
+                                                  categories=categories,
+                                                  thumbnail=thumbnail)
 
-                    db.session.add(created_book)
-                    db.session.commit()
+                        db.session.add(created_book)
+                        db.session.commit()
 
-                    fetched_books[i] = created_book
+                        fetched_books[i] = created_book
 
-            books += fetched_books
-            books = [
-                book for book in books
-                if book is not None and not isinstance(book, dict)
-            ]
-            books = list(set(books))
-            books = books[:10]
+                books += fetched_books
+                books = [
+                    book for book in books
+                    if book is not None and not isinstance(book, dict)
+                ]
+                books = list(set(books))
+                books = books[:10]
 
     return render_template("books/browse.html", books=books)
 
@@ -198,7 +208,7 @@ def book(id: int):
     categories: Union[list, None] = book.categories.split(
         ",") if book.categories != None else None
     thumbnail: Union[str, None] = book.thumbnail
-    average_rating: Union[int, None] = book.average_rating
+    average_rating: Union[float, None] = book.average_rating
 
     my_rating: Union[int, None] = saved_book.rating
     my_review: Union[str, None] = saved_book.review
@@ -261,17 +271,17 @@ def review(id: int):
 
     bookname: str = book.bookname
 
-    saved_rating: Union[int, None] = saved_book.rating
+    saved_rating: Union[float, None] = saved_book.rating
     saved_review: Union[str, None] = saved_book.review
 
     if request.method == "POST":
-        rating: Union[int, str, None] = request.form.get("rating", None)
+        rating: Union[float, str, None] = request.form.get("rating", None)
         review: Union[str, None] = request.form.get("review", None)
 
         if rating is None or review is None:
             flash("Malformed request.")
         else:
-            rating = int(rating)
+            rating = float(rating)
 
             saved_book.rating = rating
             saved_book.review = review
@@ -303,9 +313,14 @@ def add_to_reading_list(id: int):
     saved_book: SavedBook = SavedBook.query.filter_by(
         book_id=id, user_id=session.get("user_id")).first_or_404()
 
-    saved_book.to_be_read = True
+    if saved_book.rating is None and saved_book.review is None:
+        flash("Please review the book first.")
 
-    db.session.commit()
+        return redirect(url_for("books.review", id=saved_book.book_id))
+    else:
+        saved_book.to_be_read = True
+
+        db.session.commit()
 
     return redirect(url_for("books.my_books"))
 

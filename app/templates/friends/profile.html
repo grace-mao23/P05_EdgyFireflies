@@ -22,7 +22,9 @@
   <div class="card-body">
     <h5 class="card-title d-flex flex-row justify-content-between border-bottom mb-3 py-2">
       My Profile
+      {% if is_logged_in_user %}
       <a href="{{ url_for('friends.edit') }}" role="button" class="btn btn-outline-dark btn-sm">Edit</a>
+      {% endif %}
     </h5>
     <div class="d-flex flex-row">
       <div class="mr-2">
@@ -35,7 +37,9 @@
       </div>
       <div>
         <div class="container p-2">
+          {% if is_logged_in_user %}
           <p class="font-weight-bold">Username: <span class="align-middle badge badge-dark"> {{ username }} </span></p>
+          {% endif %}
           <p class="font-weight-bold">Display Name: <span class="align-middle badge badge-dark"> {{ display_name }}
             </span></p>
           <p class="font-weight-bold">Bio: {{ bio }}</p>
@@ -44,15 +48,10 @@
     </div>
   </div>
 </div>
-<div class="card my-3 text-dark bg-white shadow-sm rounded">
-  <div class="card-body">
-    <h5 class="card-title border-bottom pb-3">Recent Messages</h5>
-  </div>
-</div>
 <div class="card-deck">
   <div class="card text-dark bg-white shadow-sm rounded">
     <div class="card-body">
-      <h5 class="card-title border-bottom pb-3">Friends</h5>
+      <h5 class="card-title border-bottom pb-3">Recent Messages</h5>
     </div>
   </div>
   <div class="card text-dark bg-white shadow-sm rounded">
@@ -62,7 +61,10 @@
       <ul class="list-group">
         {% for saved_book in saved_books %}
         {% if saved_book.to_be_read %}
-        <li class="list-group-item">{{ books[loop.index0].bookname }}</li>
+        <li class="list-group-item d-flex flex-row justify-content-between">
+          <h5>{{ books[loop.index0].bookname }}</h5>
+          <a href="{{ url_for('books.book', id=books[loop.index0].id) }}" class="btn btn-secondary btn-sm">View</a>
+        </li>
         {% endif %}
         {% endfor %}
       </ul>

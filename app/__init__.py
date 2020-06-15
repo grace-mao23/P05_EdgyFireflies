@@ -6,8 +6,10 @@ from flask_sqlalchemy import SQLAlchemy
 from googleapiclient.discovery import build, Resource
 from typing import Union
 
-# Created SQLAlchemy object, SocketIO object
+# Created SQLAlchemy object
 db: SQLAlchemy = SQLAlchemy()
+
+# Define Flask SocketIO and related variables
 socketio: SocketIO = SocketIO()
 
 # Define Google API client
@@ -44,11 +46,12 @@ def create_app(config: dict = None) -> Flask:
 
     # Register blueprints
 
-    from app import auth, books, friends
+    from app import auth, books, friends, match
 
     app.register_blueprint(auth.bp)
     app.register_blueprint(books.bp)
     app.register_blueprint(friends.bp)
+    app.register_blueprint(match.bp)
 
     # Database and socketio configuration
 

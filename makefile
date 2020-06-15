@@ -24,6 +24,9 @@ format:
 	$(VIRTUAL_ENV_BIN)/yapf -r -i --style pep8 -p -vv ./tests
 	$(VIRTUAL_ENV_BIN)/yapf -r -i --style pep8 -p -vv ./*.py
 
+remove-db:
+	rm -r instance/
+
 clean:
 	rm -r env
 	rm -r instance/
