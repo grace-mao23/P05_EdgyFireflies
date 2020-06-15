@@ -18,7 +18,7 @@ def profile(id: int):
     View a user's profile.
 
     :param int id: The user ID
-    
+
     :return: Render template
     """
     user: User = User.query.filter_by(id=id).first_or_404()
@@ -72,5 +72,6 @@ def edit():
             db.session.commit()
 
             flash("Bio updated.")
+            return redirect(url_for('friends.profile',id=session.get("user_id")))
 
     return render_template("friends/edit.html", bio=bio)
