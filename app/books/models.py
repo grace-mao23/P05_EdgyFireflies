@@ -28,7 +28,7 @@ class Book(db.Model):
       year
       tags
     """
-    __table_args__ = {"extend_existing": True}
+    
     book_id = db.Column(db.Integer, primary_key=True)
     author_id = db.Column(db.ForeignKey(Author.author_id), nullable=False)
     title = db.Column(db.String, unique=True, nullable=False)

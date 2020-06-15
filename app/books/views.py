@@ -90,11 +90,11 @@ def browse():
 
         #loop through queried books
         for i in range(len(books)):
+            isbn = books[i]['volumeInfo']['industryIdentifiers'][0]['identifier']
             book = Book.query.filter_by(isbn = isbn).first()
             #if book doesn't exist in the database yet, collect data from APIs
             if book == None:
                 #collecting title and author from Google API
-                isbn = books[i]['volumeInfo']['industryIdentifiers'][0]['identifier']
                 title = books[i]['volumeInfo']['title']
                 author_name = books[i]['volumeInfo']['authors'][0]
                 cover_url = books[i]['volumeInfo']['imageLinks']['thumbnail']
