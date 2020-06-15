@@ -24,7 +24,7 @@ service: Resource = build("books", "v1", developerKey=api_key)
 def create_app(config: dict = None) -> Flask:
     """
     Create and configure a Flask app.
-    
+
     :param dict config: The test configuration object
 
     :return: A Flask application instance.
