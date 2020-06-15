@@ -8,7 +8,7 @@
     <a class="nav-link text-muted" href="{{ url_for('books.home') }}">Home</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link text-muted" href="{{ url_for('books.settings') }}">Settings</a>
+    <a class="nav-link text-muted" href="{{ url_for('auth.settings') }}">Settings</a>
   </li>
   <li class="nav-item">
     <a class="nav-link text-muted" href="{{ url_for('auth.logout') }}">Sign out</a>
@@ -17,9 +17,14 @@
 {% endblock %}
 
 {% block content %}
+{{ super() }}
+<div class="bg-dark text-white rounded bg-dark text-white rounded shadow-sm px-3 mb-3">
+  <h3 class="py-3">Welcome back, {{ display_name }}!</h3>
+</div>
 <div class="btn-group-vertical d-flex justify-content-center">
-  <a role="button" class="btn btn-outline-dark" href="{{ url_for('friends.get_profile') }}">Profile</a>
+  <a role="button" class="btn btn-outline-dark" href="{{ url_for('friends.profile', id=user_id) }}">Profile</a>
   <a role="button" class="btn btn-outline-dark" href="{{ url_for('books.browse') }}">Browse Books</a>
-  <a role="button" class="btn btn-outline-dark" href="{{ url_for('friends.match') }}">Match</a>
+  <a role="button" class="btn btn-outline-dark" href="{{ url_for('books.my_books') }}">See All My Books</a>
+  <a role="button" class="btn btn-outline-dark" href="{{ url_for('match.match') }}">Match</a>
 </div>
 {% endblock %}

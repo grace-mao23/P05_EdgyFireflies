@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [master, refactor]
   pull_request:
-    branches: [master]
+    branches: [master, refactor]
 
 jobs:
   build:
@@ -30,4 +30,4 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
       - name: Test with pytest
         run: |
-          python -m pytest
+          GOOGLE_BOOKS_API_KEY=${{ secrets.GOOGLE_BOOKS_API_KEY }} python -m pytest

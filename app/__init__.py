@@ -1,38 +1,40 @@
 import os
 
-from flask import (Flask, render_template)
+from flask import Flask, flash, redirect, url_for
 from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
-from app.forms import SearchForm
-from urllib.request import urlopen
-import urllib.request as urllib
-import json
+from googleapiclient.discovery import build, Resource
+from typing import Union
+
+# Created SQLAlchemy object
+db: SQLAlchemy = SQLAlchemy()
+
+# Define Flask SocketIO and related variables
+socketio: SocketIO = SocketIO()
+
+# Define Google API client
+api_key: Union[str, None] = os.environ.get("GOOGLE_BOOKS_API_KEY", None)
+
+if api_key is None:
+    raise ValueError("Missing API key")
+
+service: Resource = build("books", "v1", developerKey=api_key)
 
 
-# Created SQLAlchemy object, but is not binded to any Flask application
-db = SQLAlchemy()
-
-# Created SocketIO object, but is not binded to any Flask application
-socketio = SocketIO()
-
-
-def create_app(config=None):
-    """Create and configure a Flask app.
-    Args:
-      config: A test configuration object.
-
-    Returns:
-      A Flask application instance.
+def create_app(config: dict = None) -> Flask:
     """
-    # Application configuartion
-    # ---START---
+    Create and configure a Flask app.
+    
+    :param dict config: The test configuration object
 
-    app = Flask(__name__)
+    :return: A Flask application instance.
+    """
+    app: Flask = Flask(__name__)
 
-    database_url = os.environ.get("DATABASE_URL", None)
+    database_url: str = os.environ.get("DATABASE_URL", None)
 
     if database_url is None:
-        database_url = f"sqlite:///{os.path.join(app.instance_path, 'database.sqlite')}"
+        database_url: str = f"sqlite:///{os.path.join(app.instance_path, 'database.sqlite')}"
 
     app.config.from_mapping(SECRET_KEY=os.environ.get("SECRET_KEY", "dev"),
                             SQLALCHEMY_DATABASE_URI=database_url,
@@ -42,21 +44,16 @@ def create_app(config=None):
     if config is not None:
         app.config.update(config)
 
-    # ---END---
-
     # Register blueprints
-    # ---START---
 
-    from app import auth, books, friends
+    from app import auth, books, friends, match
 
     app.register_blueprint(auth.bp)
     app.register_blueprint(books.bp)
     app.register_blueprint(friends.bp)
-
-    # ---END---
+    app.register_blueprint(match.bp)
 
     # Database and socketio configuration
-    # ---START---
 
     db.init_app(app)
     socketio.init_app(app)
@@ -69,30 +66,37 @@ def create_app(config=None):
             db.create_all()
     except OSError:
         pass
+<<<<<<< HEAD
         
     with app.app_context():
         db.drop_all()
         db.create_all()
     # ---END---
+=======
+
+>>>>>>> bf4b7389ed78361e4f29e19f7800eb4e21a25ce4
     # Define middlewares
-    # ---START---
 
     @app.teardown_request
-    def teardown_session(exception=None):
+    def teardown_session(exception: Exception = None) -> None:
+        """
+        Teardown the current session on request teardown.
+
+        :param Exception exception: Any exception thrown
+
+        :returns: None
+        """
         db.session.remove()
 
-    # ---END---
-
     # Define boilerplate routes. Replace or delete for an actual application.
-    # ---START---
-
-    @app.route("/hello")
-    def hello():
-        return "Hello, world!"
 
     app.add_url_rule("/", endpoint="index")
 
+    # Define error handling
 
-    # ---END---
+    @app.errorhandler(404)
+    def handle_404_not_found(error):
+        flash(f"{error}")
+        return redirect(url_for("index"))
 
     return app

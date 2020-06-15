@@ -1,19 +1,21 @@
 import os
 import pytest
 
+from flask import Flask, Response
+from flask.testing import FlaskClient
+
 from app import create_app, db
-from app.auth.models import User
+from app.models import User
 
 
 @pytest.fixture
-def app():
-    """Create and configure a new test app instance.
+def app() -> Flask:
+    """
+    Create and configure a new test app instance.
 
-    Args:
-      None
+    :param: None
     
-    Returns:
-      A new test app instance as a generator.
+    :return: Flask
     """
     assert 2 + 2 == 4
 
@@ -26,66 +28,69 @@ def app():
         db.drop_all()
         db.create_all()
 
-        user = User(email="test@example.com", username="test", password="test")
+        user = User(username="test", display_name="Tester", password="test")
 
         db.session.add(user)
-        
+
         db.session.commit()
 
     yield app
 
 
 @pytest.fixture
-def client(app):
-    """Create a test client for the test app instance.
+def client(app: Flask) -> FlaskClient:
+    """
+    Create a test client for the test app instance.
 
-    Args:
-      app: A test app instance.
+    :param Flask app: A test app instance.
 
-    Returns:
-      A test client for the given app instance.
+    :return: FlaskClient
     """
     return app.test_client()
 
 
 class AuthActions:
-    """Define the authentication class for testing.
-
-    Actions:
-      register
-      login
-      logout
     """
-    def __init__(self, client):
+    Define the authentication class for testing.
+
+    :method register:
+    :method login:
+    :method logout:
+    """
+    def __init__(self, client: FlaskClient):
         self._client = client
 
-    def register(self, email="a@example.com", username="a", password="a"):
+    def register(self,
+                 username: str = "a",
+                 display_name: str = "Tester",
+                 password: str = "a") -> Response:
         return self._client.post("/auth/register",
                                  data={
-                                     "email": email,
                                      "username": username,
+                                     "display_name": display_name,
                                      "password": password
                                  })
 
-    def login(self, username="test", password="test"):
+    def login(self,
+              username: str = "test",
+              password: str = "test") -> Response:
         return self._client.post("/auth/login",
                                  data={
                                      "username": username,
                                      "password": password
                                  })
 
-    def logout(self):
+    def logout(self) -> Response:
         return self._client.get("/auth/logout")
 
 
 @pytest.fixture
-def auth(client):
-    """Creates an AuthActions class.
+def auth(client: FlaskClient) -> AuthActions:
+    """
+    Create an AuthActions class.
 
-    Args:
-      client: A test client for the given app instance.
+    :param FlaskClient client: A test client for the given app instance.
     
-    Returns:
-      An AuthActions class.
+    :return: AuthActions
     """
     return AuthActions(client)

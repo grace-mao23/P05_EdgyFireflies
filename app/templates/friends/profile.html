@@ -8,7 +8,7 @@
     <a class="nav-link text-muted" href="{{ url_for('books.home') }}">Home</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link text-muted" href="{{ url_for('books.settings') }}">Settings</a>
+    <a class="nav-link text-muted" href="{{ url_for('auth.settings') }}">Settings</a>
   </li>
   <li class="nav-item">
     <a class="nav-link text-muted" href="{{ url_for('auth.logout') }}">Sign out</a>
@@ -17,37 +17,58 @@
 {% endblock %}
 
 {% block content %}
-<div class="card my-3 text-black bg-white shadow rounded">
+{{ super() }}
+<div class="card my-3 text-black bg-white shadow-sm rounded">
   <div class="card-body">
-    <h5 class="card-title border-bottom pb-3">My Profile</h5>
-      <div class="row no-gutters">
-        <div class="col-md-4">
-          <img src="https://img.pngio.com/user-logos-user-logo-png-1920_1280.png" class="card-img" alt="...">
-        </div>
-        <div class="col-md-8">
-          <div class="card-body">
-            <p class="card-text">Name: <kbd> {{username}} </kbd></p>
-            <p class="card-text">Email: <kbd> {{email}} </kbd></p>
-            <p class="card-text">Bio: <kbd> {{bio}} </kbd> </p>
-          </div>
+    <h5 class="card-title d-flex flex-row justify-content-between border-bottom mb-3 py-2">
+      My Profile
+      {% if is_logged_in_user %}
+      <a href="{{ url_for('friends.edit') }}" role="button" class="btn btn-outline-dark btn-sm">Edit</a>
+      {% endif %}
+    </h5>
+    <div class="d-flex flex-row">
+      <div class="mr-2">
+        <svg class="bi bi-person-square" width="10em" height="10em" viewBox="0 0 16 16" fill="currentColor"
+          xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd"
+            d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+          <path fill-rule="evenodd" d="M2 15v-1c0-1 1-4 6-4s6 3 6 4v1H2zm6-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+        </svg>
+      </div>
+      <div>
+        <div class="container p-2">
+          {% if is_logged_in_user %}
+          <p class="font-weight-bold">Username: <span class="align-middle badge badge-dark"> {{ username }} </span></p>
+          {% endif %}
+          <p class="font-weight-bold">Display Name: <span class="align-middle badge badge-dark"> {{ display_name }}
+            </span></p>
+          <p class="font-weight-bold">Bio: {{ bio }}</p>
         </div>
       </div>
-  </div>
-</div>
-<div class="card my-3 text-white bg-dark shadow rounded">
-  <div class="card-body">
-    <h5 class="card-title border-bottom pb-3">Recent Messages</h5>
+    </div>
   </div>
 </div>
 <div class="card-deck">
-  <div class="card text-white bg-dark shadow-sm rounded">
+  <div class="card text-dark bg-white shadow-sm rounded">
     <div class="card-body">
-      <h5 class="card-title border-bottom pb-3">Friends</h5>
+      <h5 class="card-title border-bottom pb-3">Recent Messages</h5>
     </div>
   </div>
-  <div class="card text-white bg-dark shadow-sm rounded">
+  <div class="card text-dark bg-white shadow-sm rounded">
     <div class="card-body">
       <h5 class="card-title border-bottom pb-3">Reading List</h5>
+      {% if saved_books %}
+      <ul class="list-group">
+        {% for saved_book in saved_books %}
+        {% if saved_book.to_be_read %}
+        <li class="list-group-item d-flex flex-row justify-content-between">
+          <h5>{{ books[loop.index0].bookname }}</h5>
+          <a href="{{ url_for('books.book', id=books[loop.index0].id) }}" class="btn btn-secondary btn-sm">View</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+      </ul>
+      {% endif %}
     </div>
   </div>
 </div>
