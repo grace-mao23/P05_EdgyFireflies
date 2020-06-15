@@ -5,6 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!--Ignore favicon-->
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
   <!--Bootstrap CSS-->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
     integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
@@ -46,15 +49,14 @@
     {% endblock %}
     {% block content %}
     {% for message in get_flashed_messages() %}
-    <div class="flash">{{ message }}</div>
+    <div class="flash alert alert-primary" role="alert">{{ message }}</div>
     {% endfor %}
     {% endblock %}
     {% block footer %}
   </div>
   <footer class="mt-auto py-3 bg-light">
     <div>
-      <p class="container text-muted">&copy; Copyright 2020 Edgy Fireflies | <a
-          href="https://github.com/grace-mao23/P05_EdgyFireflies">Source</a></p>
+      <p class="container text-muted">&copy; Copyright 2020 Edgy Fireflies</p>
     </div>
   </footer>
   {% endblock %}

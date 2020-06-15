@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Read and Chill | {{ bookname }}{% endblock %}
+
+{% block navigation %}
+<ul class="navbar-nav ml-auto">
+  <li class="nav-item">
+    <a class="nav-link text-muted" href="{{ url_for('books.home') }}">Home</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link text-muted" href="{{ url_for('auth.settings') }}">Settings</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link text-muted" href="{{ url_for('auth.logout') }}">Sign out</a>
+  </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+{{ super() }}
+<div class="card text-dark bg-white mb-3 shadow-sm">
+  <div class="card-header bg-white ">
+    <h3 class="font-italic mt-2">{{ bookname }}</h3>
+  </div>
+  <div class="row no-gutters">
+    <div class="col-md-2">
+      <img class="card-img img-thumbnail" src="{{ thumbnail }}" alt="Thumbnail">
+    </div>
+    <div class="border-left col-md-10">
+      <div class="card-body">
+        <h5 class="card-title">By: {{ author|join(', ') }}</h5>
+        {% if average_rating %}
+        <span class="badge badge-warning mb-3">Average Rating: {{ average_rating }} / 5</span>
+        {% endif %}
+        {% if description %}
+        <p class="card-text">{{ description }}</p>
+        {% endif %}
+        <p class="card-text d-flex flex-column">
+          {% if categories %}
+          <span class="text-muted d-flex flex-row mb-1">
+            {% for category in categories %}
+            <span class="badge badge-primary">{{ category }}</span>
+            {% endfor %}
+          </span>
+          {% endif %}
+          <small class="text-muted">ISBN: {{ isbn }}</small>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% if my_rating is not none and my_review is not none %}
+<div class="card text-dark bg-white shadow-sm">
+  <div class="card-body">
+    <div class="row justify-content-between px-3">
+      <h5 class="card-title">My Review</h5>
+      <h5 class="text-muted font-italic align-bottom">{{ my_rating }} / 5</h5>
+    </div>
+    <p class="card-text">{{ my_review }}</p>
+    <a href="{{ url_for('books.review', id=book_id) }}" class="ml-auto card-link">Edit</a>
+  </div>
+</div>
+{% else %}
+<div class="d-flex flex-row">
+  <a href="{{ url_for('books.review', id=book_id) }}" class="ml-auto btn btn-outline-primary" role="button"
+    aria-pressed="true">Add My Review</a>
+</div>
+{% endif %}
+{% endblock %}

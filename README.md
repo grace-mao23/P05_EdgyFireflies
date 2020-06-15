@@ -2,7 +2,7 @@
 
 Read and Chill: Read Your Way to Real Romance
 
-![](https://github.com/grace-mao23/P05_EdgyFireflies/workflows/CI/badge.svg)
+![CI Status](https://github.com/grace-mao23/P05_EdgyFireflies/workflows/CI/badge.svg)
 
 ## Roster
 
@@ -33,20 +33,22 @@ Available Make Commands:
 
 If you are not able to use make, use the following:
 
-1. Clone the Git repository.
+1. Procure a Google Books API key from Google Cloud Console.
+
+2. Clone the Git repository.
 
 ```bash
 git clone https://github.com/grace-mao23/P05_EdgyFireflies.git
 ```
 
-2. Setup the application environment.
+3. Setup the application environment.
 
 ```bash
 python3 -m venv env
 env/bin/pip install -r requirements.txt
 ```
 
-3. Run the application.
+4. Run the application.
 
 ```bash
 FLASK_ENV=development env/bin/python application.py
