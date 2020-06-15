@@ -124,8 +124,6 @@ def browse():
                 pics.append(books.cover_url)
 
         print(dict)
-        #print(dict) ['imageLinks']['thumbnail']
-        url = "http://openlibrary.org/search.json?q=" + str(form.search.data)
 
     if request.method == "POST":
         pass
