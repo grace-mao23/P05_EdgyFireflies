@@ -1,3 +1,11 @@
+jun taoL -- 2020-06-15 22:41
+  - added messaging
+  - added recommendation
+  - added reading list
+  - added recent matches
+  - fixed some bugs
+  - added changes to minor details
+
 josephL -- 2020-06-15 14:40
   - reviewed merged code, found bugs
   - fixed bio updating redirect bug
