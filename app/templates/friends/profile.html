@@ -51,7 +51,20 @@
 <div class="card-deck">
   <div class="card text-dark bg-white shadow-sm rounded">
     <div class="card-body">
-      <h5 class="card-title border-bottom pb-3">Recent Messages</h5>
+      <h5 class="card-title border-bottom pb-3">Recent Matches</h5>
+      {% if other_users %}
+      <ul class="list-group">
+        {% for other_user in other_users %}
+        <li class="list-group-item">
+          <form class="d-flex flex-row justify-content-between" action="{{ url_for('match.connect') }}" method="POST">
+            <h5>{{ other_user.display_name }}</h5>
+            <input type="hidden" name="other_user_id" id="other_user_id" value="{{ other_user.id }}" />
+            <button type="submit" class="btn btn-sm btn-secondary">Connect</button>
+          </form>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
     </div>
   </div>
   <div class="card text-dark bg-white shadow-sm rounded">

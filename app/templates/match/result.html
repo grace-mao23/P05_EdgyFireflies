@@ -24,8 +24,8 @@
 {% if elo is not none and potential_friends is not none %}
 <ul class="list-group">
   {% for score in elo %}
-  <li class="list-group-item d-flex flex-row justify-content-between">
-    <form action="{{ url_for('match.connect') }}" method="POST">
+  <li class="list-group-item">
+    <form class="d-flex flex-row justify-content-between" action="{{ url_for('match.connect') }}" method="POST">
       <h5>{{ potential_friends[loop.index0].display_name }}</h5>
       <input type="hidden" name="other_user_id" id="other_user_id" value="{{ potential_friends[loop.index0].id }}" />
       <div class="btn-group btn-group-sm" role="group" aria-label="book-actions">

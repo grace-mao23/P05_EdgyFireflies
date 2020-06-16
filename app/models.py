@@ -1,4 +1,5 @@
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.sql import func
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import db
@@ -111,6 +112,9 @@ class MessageSession(db.Model):
     :attribute Column user_a_id: The user ID
     :attribute Column user_b_id: The user ID
     :attribute Column room: The room name
+    :attribute Column created: The time when this record is created
+    :attribute Column updated: The time when this record is updated
+    :attribute Column count: The number of interactions
     """
     id: db.Column = db.Column(db.Integer, primary_key=True)
     user_a_id: db.Column = db.Column(db.Integer,
@@ -122,3 +126,8 @@ class MessageSession(db.Model):
                                      unique=True,
                                      nullable=False)
     room: db.Column = db.Column(db.String, unique=True, nullable=False)
+    created: db.Column = db.Column(db.DateTime(timezone=True),
+                                   server_default=func.now())
+    updated: db.Column = db.Column(db.DateTime(timezone=True),
+                                   onupdate=func.now())
+    count: db.Column = db.Column(db.Integer, default=0, nullable=False)

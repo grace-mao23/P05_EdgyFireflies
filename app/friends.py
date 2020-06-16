@@ -2,11 +2,12 @@ import functools
 
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 from flask_socketio import disconnect
+from sqlalchemy import or_, and_
 from typing import Union
 
 from app import db
 from .auth import login_required
-from .models import Book, SavedBook, User
+from .models import Book, MessageSession, SavedBook, User
 
 bp: Blueprint = Blueprint("friends", __name__, url_prefix="/friends")
 
@@ -38,10 +39,27 @@ def profile(id: int):
 
     is_logged_in_user: bool = user.id == session.get("user_id")
 
+    other_user_ids: Union[list, None] = MessageSession.query.filter(
+        or_(MessageSession.user_a_id == user.id,
+            MessageSession.user_b_id == user.id)).order_by(
+                MessageSession.count.desc()).all()[:10]
+
+    for i, other_user_id in enumerate(other_user_ids):
+        if other_user_id.user_a_id == user.id:
+            other_user_ids[i] = other_user_id.user_b_id
+        else:
+            other_user_ids[i] = other_user_id.user_a_id
+
+    other_users: list = []
+
+    for other_user_id in other_user_ids:
+        other_users.append(User.query.filter_by(id=other_user_id).first())
+
     return render_template("friends/profile.html",
                            username=username,
                            display_name=display_name,
                            bio=bio,
+                           other_users=other_users,
                            saved_books=saved_books,
                            books=books,
                            is_logged_in_user=is_logged_in_user)
@@ -72,6 +90,7 @@ def edit():
             db.session.commit()
 
             flash("Bio updated.")
-            return redirect(url_for('friends.profile',id=session.get("user_id")))
+            return redirect(
+                url_for('friends.profile', id=session.get("user_id")))
 
     return render_template("friends/edit.html", bio=bio)
