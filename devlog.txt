@@ -1,3 +1,6 @@
+graceM -- 2020-06-16 22:47
+  - uploaded demo
+
 jun taoL -- 2020-06-15 22:41
   - added messaging
   - added recommendation
@@ -30,6 +33,9 @@ josephL -- 2020-06-10 15:02
   - finished basic search function
   - adjusted sql model relationships
   - found two book apis that work in tandem
+
+graceM -- 2020-06-10 14:05
+  - held team meeting to discuss timeline
 
 josephL -- 2020-06-09 11:01
   - created search app route
